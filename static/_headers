@@ -1,2 +1,8 @@
+# Pagina's, stijl en speellijsten: altijd de nieuwste versie tonen
+/*
+  Cache-Control: no-cache
+
+# Foto's mogen een week in de browser blijven (een nieuwe foto krijgt altijd een nieuwe naam)
 /images/*
+  ! Cache-Control
   Cache-Control: public, max-age=604800

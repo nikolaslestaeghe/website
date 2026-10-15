@@ -134,6 +134,7 @@ const head = (title) => `<!DOCTYPE html>
   <link rel="stylesheet" type="text/css" href="/css/normalize.css">
   <link rel="stylesheet" type="text/css" href="/css/webflow.css">
   <link rel="stylesheet" type="text/css" href="/css/nikolaslestaeghenoimages.webflow.css">
+  <link rel="stylesheet" type="text/css" href="/css/aanvullingen.css">
   <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js"></script>
   <script>
     if (window.WebFont) WebFont.load({

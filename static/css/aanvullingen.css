@@ -1,0 +1,7 @@
+/* Kleine aanvullingen op de originele opmaak (die blijft ongewijzigd). */
+
+/* Foto's in de slider: nooit uitrekken of samendrukken, ook niet bij brede of staande foto's. */
+.republiek-slider-foto-eig {
+  object-fit: contain;
+  width: 100%;
+}
