@@ -21,19 +21,37 @@ De site gebruikt exact de opmaak van de oude site. Er valt niets te updaten en e
 
 ## Een project toevoegen
 
-1. Open app.pagescms.org → **Projecten** → **Add an entry**.
-2. Vul titel, jaar, tekst, credits en foto's in. Elk project heeft drie sfeerfoto's, net als vroeger: de grote foto bovenaan, de foto achter 'In beeld' en de tegel op de projectenpagina. Daaronder komen de foto's van de slider. Foto's sleep je gewoon in het veld.
+1. Open app.pagescms.org → kies **website** → **Projecten** → **Add an entry** (of *Nieuw*).
+2. Vul in:
+   - **Titel** en **Jaar** (bv. `2024` of `2018 – 2026`; het laatste jaartal bepaalt de volgorde).
+   - **Titel op de foto** alleen als je hem anders wil afbreken dan de gewone titel.
+   - De drie sfeerfoto's, net als vroeger: **grote foto bovenaan**, **foto achter 'In beeld'** en **foto op de projectenpagina**.
+   - **Inleiding** (blauw gedrukt), **Tekst**, eventueel een **Citaat** en de **Credits** (één rol per regel).
+   - **Foto's** voor de slider en de **Fotocredits**. Foto's sleep je gewoon in het veld.
+   - **Links** voor de rechterkolom (pers, partners, ...).
+   - De **Speellijst** (zie hieronder).
 3. Klik **Save**. Na ongeveer een minuut staat het online.
 
 Tips:
-- Het jaar bepaalt de volgorde. Bij een lopend project schrijf je bv. `2018 – 2026`.
-- Verberg een project dat nog niet klaar is met **Zichtbaar op de site** uit te zetten.
-- Er staan al drie verborgen projecten klaar om in te vullen: *Attraction Park Under Construction*, *Bonkers kidsrave* en *The Introverse*.
-- Foto's: liefst jpg, ongeveer 2000 pixels breed. Grotere foto's maken de site traag. Liggende foto's werken het best.
+- Werk je nog aan een project? Zet **Zichtbaar op de site** uit tot het klaar is.
+- Er staan al drie verborgen projecten klaar: *Attraction Park Under Construction*, *Bonkers kidsrave* en *The Introverse*.
+- Foto's: liefst liggend, jpg, ongeveer 2000 pixels breed.
 
-## Agenda
+## Speellijsten en agenda
 
-**Agenda → Add an entry**: datum, titel, plaats en eventueel een link. Voorbije data verhuizen vanzelf naar het archief. Koppel je een project, dan linkt de titel naar de projectpagina. 
+Elk project heeft een eigen speellijst. Daar zijn twee manieren voor:
+
+- **Datum per datum**: in het project bij **Speellijst** op *Add* klikken en datum, uur, plaats, ticketlink en eventueel een opmerking (uitverkocht, première, ...) invullen.
+- **Als bestand**: laad bij **Speellijst als Excel- of CSV-bestand** een Excel-bestand (.xlsx) of CSV op, bv. de speellijst die je van de productie of het spreidingsbureau krijgt. De eerste rij met kolomnamen moet minstens een kolom **datum** hebben; verder herkent de site *uur/aanvang*, *locatie/zaal*, *stad/gemeente*, *link/tickets* en *opmerking*. Een titelrij erboven mag. Een nieuwe versie van de speellijst? Laad gewoon het nieuwe bestand op.
+
+Beide mogen ook samen.
+
+Wat de site daarmee doet:
+- De **agendapagina** toont alle komende data van alle projecten samen, op datum.
+- Voorbije data verhuizen **vanzelf** naar het **archief**, gegroepeerd per jaar. Dat gebeurt telkens iemand de pagina opent, dus ook als je een tijd niets aanpast.
+- Op elke **projectpagina** staan onder de credits de komende *Speeldata* en, openklapbaar, *Eerder gespeeld*.
+
+Iets dat niet bij een project hoort (een lezing, een workshop)? Gebruik **Losse agendapunten**.
 
 ## Biografie en contactgegevens
 

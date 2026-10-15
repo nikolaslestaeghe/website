@@ -5,6 +5,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const { leesBestand, leesDatum, leesUur } = require("./speellijst");
 
 const ROOT = __dirname;
 const CONTENT = path.join(ROOT, "content");
@@ -54,6 +55,7 @@ const fotoAttr = (base, orig, gekozen, extraStyle = "") => {
   let style = "";
   if (orig && (!gekozen || gekozen === orig[1])) cls.push(orig[0]);
   else if (gekozen) style = `background-image:${cssUrl(gekozen)};${extraStyle}`;
+  else style = "background-color:#4778ff;"; // nog geen foto: blauw vlak in de huisstijl
   return `class="${cls.join(" ")}"${style ? ` style="${esc(style)}"` : ""}`;
 };
 
@@ -76,9 +78,44 @@ const site = readJSON(path.join(CONTENT, "site.json"));
 const bio = readJSON(path.join(CONTENT, "biografie.json"));
 const projects = readCollection("projecten").filter((p) => p.zichtbaar !== false)
   .sort((a, b) => sortYear(b.jaar) - sortYear(a.jaar) || (b.volgorde || 0) - (a.volgorde || 0));
-const agenda = readCollection("agenda").sort((a, b) => String(a.datum).localeCompare(String(b.datum)));
-const upcoming = agenda.filter((a) => String(a.datum) >= todayISO());
-const past = agenda.filter((a) => String(a.datum) < todayISO()).reverse();
+const alleProjecten = readCollection("projecten");
+
+// ---------- speeldata ----------
+// Alle data komen samen uit: de speellijst van elk project (ingevuld of als bestand)
+// en de losse agendapunten.
+const waarschuwingen = [];
+const speeldata = [];
+const voegToe = (d, extra) => {
+  const datum = leesDatum(d.datum);
+  if (!datum) return;
+  speeldata.push({ datum, uur: d.uur ? leesUur(d.uur) : "", locatie: d.locatie || "", link: d.link || "", opmerking: d.opmerking || "", ...extra });
+};
+for (const p of alleProjecten) {
+  const extra = { titel: p.titel, slug: p.zichtbaar === false ? null : p.slug };
+  asArray(p.speellijst).forEach((d) => voegToe(d, extra));
+  if (p.speellijst_bestand) {
+    const bestand = path.join(STATIC, p.speellijst_bestand.replace(/^\//, ""));
+    try {
+      const rijen = leesBestand(bestand);
+      if (!rijen.length) waarschuwingen.push(`Geen datums gevonden in ${p.speellijst_bestand} (${p.titel}).`);
+      rijen.forEach((d) => voegToe(d, extra));
+    } catch (e) {
+      waarschuwingen.push(`Kon ${p.speellijst_bestand} (${p.titel}) niet lezen: ${e.message}`);
+    }
+  }
+}
+for (const a of readCollection("agenda")) {
+  const key = String(a.project || "").split("/").pop().replace(/\.json$/, "");
+  const proj = key && alleProjecten.find((p) => p.slug === key);
+  voegToe(a, { titel: a.titel || (proj && proj.titel) || "", slug: proj && proj.zichtbaar !== false ? proj.slug : null });
+}
+// dubbels weglaten, sorteren op datum en uur
+const gezien = new Set();
+const agenda = speeldata
+  .filter((d) => { const k = [d.datum, d.uur, d.titel, d.locatie].join("|").toLowerCase(); if (gezien.has(k)) return false; gezien.add(k); return true; })
+  .sort((a, b) => (a.datum + a.uur).localeCompare(b.datum + b.uur));
+const upcoming = agenda.filter((a) => a.datum >= todayISO());
+const past = agenda.filter((a) => a.datum < todayISO()).reverse();
 
 // ---------- vaste stukken (originele markup) ----------
 
@@ -105,7 +142,46 @@ const head = (title) => `<!DOCTYPE html>
 </head>
 <body>`;
 
-const scripts = `  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+// Verschuift data die intussen voorbij zijn naar het archief, telkens iemand de pagina bekijkt.
+// Zo blijft de agenda juist, ook als de site een tijd niet opnieuw gebouwd werd.
+const datumScript = `  <script>
+  (function () {
+    var t = new Date(), p = function (n) { return (n < 10 ? "0" : "") + n; };
+    var vandaag = t.getFullYear() + "-" + p(t.getMonth() + 1) + "-" + p(t.getDate());
+    var blokken = document.querySelectorAll("[data-komend]");
+    for (var i = 0; i < blokken.length; i++) {
+      var komend = blokken[i], archief = document.getElementById(komend.getAttribute("data-komend"));
+      if (!archief) continue;
+      var items = komend.querySelectorAll("[data-datum]"), verplaatst = 0;
+      for (var j = 0; j < items.length; j++) {
+        var d = items[j].getAttribute("data-datum");
+        if (d < vandaag) {
+          var jaar = archief.querySelector("[data-jaar='" + d.slice(0, 4) + "']");
+          if (!jaar && archief.querySelector("[data-jaar]")) {
+            jaar = archief.querySelector("[data-jaar]").cloneNode(false);
+            jaar.setAttribute("data-jaar", d.slice(0, 4)); jaar.textContent = d.slice(0, 4);
+            archief.insertBefore(jaar, archief.firstChild);
+          }
+          archief.insertBefore(items[j], jaar ? jaar.nextSibling : archief.firstChild);
+          verplaatst++;
+        }
+      }
+      if (verplaatst) {
+        var wrap = archief.closest ? archief.closest("[data-archief]") : null;
+        if (wrap) wrap.style.display = "";
+        var teller = document.querySelector("[data-teller='" + archief.id + "']");
+        if (teller) teller.textContent = archief.querySelectorAll("[data-datum]").length;
+      }
+      if (!komend.querySelector("[data-datum]")) {
+        var leeg = komend.querySelector("[data-leeg]");
+        if (leeg) leeg.style.display = "";
+      }
+    }
+  })();
+  </script>`;
+
+const scripts = `${datumScript}
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
   <script type="text/javascript" src="/js/webflow.js"></script>
 </body>
 </html>
@@ -176,6 +252,64 @@ const kleineRegel = (txt) => `      <div class="w-row republiek-uitleg">
 
 const kop = (p) => lines(p.kop || p.titel).replace(/\n\s*/g, "");
 
+// ---------- speeldata weergeven ----------
+
+const linkStijl = 'class="menu-top media" style="display:inline;padding:0;text-indent:0;font-size:inherit"';
+
+// Eén regel op de agendapagina
+const agendaItem = (a) => {
+  const titel = a.slug ? `<a class="menu-top media" style="display:inline;padding:0;text-indent:0;font-size:inherit;color:inherit" href="/${a.slug}.html">${esc(a.titel)}</a>` : esc(a.titel);
+  const meta = [a.uur, a.locatie, a.opmerking].filter(Boolean).map(esc).join(" · ");
+  return `<div data-datum="${a.datum}">
+              <p class="inleiding" style="margin-bottom:2px">${formatDate(a.datum)} — ${titel}</p>
+              <p class="brood">${meta}${a.link ? `${meta ? " · " : ""}<a ${linkStijl} href="${esc(a.link)}" target="_blank">Info en tickets</a>` : ""}</p>
+            </div>`;
+};
+
+// Archief, gegroepeerd per jaar
+const perJaar = (items, render) => {
+  let jaar = "", out = "";
+  for (const a of items) {
+    const j = a.datum.slice(0, 4);
+    if (j !== jaar) { out += `<p class="hoofding-links" data-jaar="${j}" style="display:block;margin-top:18px">${j}</p>`; jaar = j; }
+    out += render(a);
+  }
+  return out;
+};
+
+function agendaInhoud() {
+  return `<div data-komend="archief-agenda">
+              <p class="brood" data-leeg${upcoming.length ? ' style="display:none"' : ""}>Binnenkort nieuwe data. Abonneer je op de nieuwsbrief om niets te missen.</p>
+              ${upcoming.map(agendaItem).join("\n              ")}
+            </div>
+            <div data-archief${past.length ? "" : ' style="display:none"'}>
+              <p class="credits-head" style="margin-top:35px">Archief</p>
+              <div id="archief-agenda">${perJaar(past, agendaItem)}</div>
+            </div>`;
+}
+
+// Speeldata onderaan een projectpagina
+const projectRegel = (a) => {
+  const meta = [a.uur, a.locatie, a.opmerking].filter(Boolean).map(esc).join(" · ");
+  return `<p class="credits" data-datum="${a.datum}" style="margin-bottom:6px">${formatDate(a.datum)}${meta ? ` · ${meta}` : ""}${a.link ? ` · <a ${linkStijl} href="${esc(a.link)}" target="_blank">tickets</a>` : ""}</p>`;
+};
+function speeldataProject(p) {
+  const eigen = agenda.filter((a) => a.titel === p.titel || a.slug === p.slug);
+  if (!eigen.length) return "";
+  const komend = eigen.filter((a) => a.datum >= todayISO());
+  const voorbij = eigen.filter((a) => a.datum < todayISO()).reverse();
+  const id = `archief-${p.slug}`;
+  return `<div data-komend="${id}">
+              <p class="credits-head" style="margin-top:25px">Speeldata</p>
+              <p class="credits" data-leeg${komend.length ? ' style="display:none"' : ""}>Momenteel geen geplande voorstellingen.</p>
+              ${komend.map(projectRegel).join("\n              ")}
+            </div>
+            <details data-archief${voorbij.length ? "" : ' style="display:none"'} style="margin-bottom:15px">
+              <summary class="credits-head" style="cursor:pointer;margin-top:15px">Eerder gespeeld (<span data-teller="${id}">${voorbij.length}</span>)</summary>
+              <div id="${id}">${voorbij.map(projectRegel).join("")}</div>
+            </details>`;
+}
+
 // ---------- pagina's ----------
 
 const pages = {};
@@ -234,6 +368,7 @@ projects.forEach((p, i) => {
     rich(p.tekst),
     p.citaat ? `<p class="citaat">${lines(p.citaat)}</p>` : "",
     p.credits ? `<p class="credits-head">Credits</p>\n            <p class="credits">${lines(p.credits)}</p>` : "",
+    speeldataProject(p),
   ].filter(Boolean).join("\n            ");
 
   pages[`${p.slug}.html`] = `${head(p.titel)}
@@ -330,15 +465,6 @@ ${tekstRij([bio.intro ? paragraphs(bio.intro, "inleiding") : "", rich(bio.tekst)
 ${footer()}
 ${scripts}`;
 
-// Agenda (zelfde opbouw als de biografie)
-const agendaItem = (a) => {
-  const key = String(a.project || "").split("/").pop().replace(/\.json$/, "");
-  const proj = key && projects.find((p) => p.slug === key);
-  const titel = proj ? `<a class="projecten-link" style="color:inherit;font-size:inherit" href="/${proj.slug}.html">${esc(a.titel)}</a>` : esc(a.titel);
-  const meta = [a.uur, a.locatie].filter(Boolean).map(esc).join(" · ");
-  return `<p class="inleiding">${formatDate(a.datum)} — ${titel}</p>
-            <p class="brood">${meta}${a.link ? `${meta ? "<br>" : ""}<a class="menu-top media" style="display:inline;padding:0;text-indent:0" href="${esc(a.link)}" target="_blank">Meer info en tickets</a>` : ""}</p>`;
-};
 pages["agenda.html"] = `${head("Agenda")}
   <div class="republiek-topfoto foto-nikolas">
     <div class="w-container">
@@ -353,11 +479,7 @@ pages["agenda.html"] = `${head("Agenda")}
     </div>
   </div>
   <div>
-${tekstRij(
-  (upcoming.length ? upcoming.map(agendaItem).join("\n            ") : `<p class="brood">Binnenkort nieuwe data. Abonneer je op de nieuwsbrief om niets te missen.</p>`) +
-  (past.length ? `\n            <p class="credits-head">Archief</p>\n            ${past.map(agendaItem).join("\n            ")}` : ""),
-  []
-)}
+${tekstRij(agendaInhoud(), [])}
   </div>
 ${footer()}
 ${scripts}`;
@@ -393,5 +515,6 @@ const missing = new Set();
 const check = (src) => { if (src && src.startsWith("/") && !fs.existsSync(path.join(OUT, src))) missing.add(src); };
 projects.forEach((p) => [p.cover, p.achterfoto, p.tegelfoto, ...asArray(p.fotos)].forEach(check));
 check(bio.portret);
-console.log(`Klaar: ${Object.keys(pages).length} pagina's, ${projects.length} projecten, ${agenda.length} agendapunten.`);
+console.log(`Klaar: ${Object.keys(pages).length} pagina's, ${projects.length} projecten, ${agenda.length} speeldata (${upcoming.length} komend).`);
+waarschuwingen.forEach((w) => console.log("Let op: " + w));
 if (missing.size) console.log(`Let op, ontbrekende foto's: ${[...missing].join(", ")}`);

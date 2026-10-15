@@ -7,6 +7,11 @@ media:
     input: static/images
     output: /images
     categories: [image]
+  - name: bestanden
+    label: Speellijsten
+    input: static/bestanden
+    output: /bestanden
+    extensions: [xlsx, csv]
 
 content:
   # ---------- Projecten ----------
@@ -74,6 +79,36 @@ content:
       - name: video
         label: Videolink (YouTube of Vimeo, optioneel)
         type: string
+      - name: speellijst
+        label: Speellijst
+        description: "Voeg per voorstelling een datum toe. Voorbije data blijven zichtbaar onder 'Eerder gespeeld' en in het agenda-archief."
+        type: object
+        list: true
+        fields:
+          - name: datum
+            label: Datum
+            type: date
+            required: true
+          - name: uur
+            label: Uur (optioneel)
+            type: string
+          - name: locatie
+            label: Plaats
+            type: string
+            description: "Bv. CC Belgica, Dendermonde"
+          - name: link
+            label: Link voor tickets (optioneel)
+            type: string
+          - name: opmerking
+            label: Opmerking (optioneel)
+            type: string
+            description: "Bv. uitverkocht, schoolvoorstelling, première"
+      - name: speellijst_bestand
+        label: Speellijst als Excel- of CSV-bestand (optioneel)
+        description: "Kolommen: datum, uur, locatie, stad, link, opmerking. Kolomnamen mogen in eender welke volgorde staan."
+        type: file
+        options:
+          media: bestanden
       - name: fotos
         label: Foto's
         type: image
@@ -105,9 +140,9 @@ content:
         type: number
         description: "Hoger getal = eerder in de lijst. Meestal mag je dit leeg laten."
 
-  # ---------- Agenda ----------
+  # ---------- Losse agendapunten (niet aan een project gebonden) ----------
   - name: agenda
-    label: Agenda
+    label: Losse agendapunten
     type: collection
     path: content/agenda
     format: json
