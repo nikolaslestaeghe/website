@@ -3,7 +3,7 @@
 ## Hoe het werkt
 
 - **GitHub** bewaart de bestanden van de site.
-- **Netlify** zet de site online. Bij elke wijziging bouwt Netlify de site automatisch opnieuw (± 1 minuut).
+- **Cloudflare Pages** zet de site online. Bij elke wijziging bouwt Cloudflare de site automatisch opnieuw (± 1 minuut). Het gratis plan laat 500 publicaties per maand toe.
 - **Pages CMS** (app.pagescms.org) is je beheerpagina: formulieren om projecten, agenda en teksten aan te passen.
 - Je domeinnaam blijft bij **one.com**.
 
@@ -14,10 +14,10 @@ De site gebruikt exact de opmaak van de oude site. Er valt niets te updaten en e
 1. **GitHub-account** maken op github.com.
 2. Op github.com: *New repository* → naam bv. `website` → *Create*. Daarna *uploading an existing file* en sleep de **inhoud** van deze map erin (niet de map zelf). Bevestig met *Commit changes*.
    - Let op: het bestand `.pages.yml` begint met een punt en is soms verborgen op je computer. Op een Mac maak je verborgen bestanden zichtbaar met Cmd + Shift + punt.
-3. **Netlify-account** maken op netlify.com, aanmelden met GitHub → *Add new site → Import an existing project* → kies je repository. De instellingen worden automatisch herkend → *Deploy*. Je krijgt een testadres zoals `iets.netlify.app`.
+3. **Cloudflare-account** maken op dash.cloudflare.com → *Workers & Pages* → *Create* → tabblad *Pages* → *Connect to Git* → kies je repository. Framework preset: *None*, build command: `node build.js`, build output directory: `dist` → *Save and Deploy*. Je krijgt een testadres zoals `website-xxx.pages.dev`.
 4. **Beheerpagina**: ga naar app.pagescms.org, meld je aan met GitHub en kies je repository.
-5. **Nieuwsbrief**: in Netlify bij *Forms* het formulier aanzetten (*Enable form detection*) en bij *Form notifications* je e-mailadres invullen. Elke inschrijving komt dan in je mailbox.
-6. **Domein omzetten** (pas als alles goed staat): in Netlify *Domain management → Add a domain* → `nikolaslestaeghe.com`. Netlify toont welke DNS-instellingen je bij one.com moet invullen. Pas die aan in het one.com-controlepaneel bij *DNS-instellingen*. Https komt er automatisch bij.
+5. **Nieuwsbrief**: wordt gekoppeld aan een nieuwsbriefdienst (nog in te stellen).
+6. **Domein omzetten** (pas als alles goed staat): in Cloudflare bij je Pages-project → *Custom domains* → `nikolaslestaeghe.com`. Cloudflare toont welke DNS-instellingen nodig zijn; die vul je in bij one.com. Https komt er automatisch bij.
 
 ## Een project toevoegen
 
