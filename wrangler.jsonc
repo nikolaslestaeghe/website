@@ -1,0 +1,11 @@
+// Instellingen voor Cloudflare: de site is een map met vaste bestanden (dist/),
+// gemaakt door `node build.js`.
+{
+  "name": "website",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    "html_handling": "none",
+    "not_found_handling": "404-page"
+  }
+}
