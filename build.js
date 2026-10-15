@@ -5,7 +5,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const { leesBestand, leesDatum, leesUur } = require("./speellijst");
+const { leesBestand, leesDatum, leesPeriode, leesUur } = require("./speellijst");
 
 const ROOT = __dirname;
 const CONTENT = path.join(ROOT, "content");
@@ -71,6 +71,11 @@ const videoEmbed = (url) => {
 const MAANDEN = ["januari", "februari", "maart", "april", "mei", "juni", "juli", "augustus", "september", "oktober", "november", "december"];
 const formatDate = (iso) => { const d = new Date(iso + "T12:00:00"); return isNaN(d) ? esc(iso) : `${d.getDate()} ${MAANDEN[d.getMonth()]} ${d.getFullYear()}`; };
 const todayISO = () => new Date().toISOString().slice(0, 10);
+const formatPeriode = (a) => {
+  if (!a.dagen || a.tot === a.datum) return formatDate(a.datum);
+  const d = new Date(a.datum + "T12:00:00");
+  return `${a.dagen} ${MAANDEN[d.getMonth()]} ${d.getFullYear()}`;
+};
 
 // ---------- inhoud ----------
 
@@ -86,9 +91,9 @@ const alleProjecten = readCollection("projecten");
 const waarschuwingen = [];
 const speeldata = [];
 const voegToe = (d, extra) => {
-  const datum = leesDatum(d.datum);
-  if (!datum) return;
-  speeldata.push({ datum, uur: d.uur ? leesUur(d.uur) : "", locatie: d.locatie || "", link: d.link || "", opmerking: d.opmerking || "", ...extra });
+  const periode = d.tot ? { datum: d.datum, tot: d.tot, dagen: d.dagen || "" } : leesPeriode(d.datum);
+  if (!periode.datum) return;
+  speeldata.push({ ...periode, uur: d.uur ? leesUur(d.uur) : "", locatie: d.locatie || "", link: d.link || "", opmerking: d.opmerking || "", ...extra });
 };
 for (const p of alleProjecten) {
   const extra = { titel: p.titel, slug: p.zichtbaar === false ? null : p.slug };
@@ -114,8 +119,8 @@ const gezien = new Set();
 const agenda = speeldata
   .filter((d) => { const k = [d.datum, d.uur, d.titel, d.locatie].join("|").toLowerCase(); if (gezien.has(k)) return false; gezien.add(k); return true; })
   .sort((a, b) => (a.datum + a.uur).localeCompare(b.datum + b.uur));
-const upcoming = agenda.filter((a) => a.datum >= todayISO());
-const past = agenda.filter((a) => a.datum < todayISO()).reverse();
+const upcoming = agenda.filter((a) => a.tot >= todayISO());
+const past = agenda.filter((a) => a.tot < todayISO()).reverse();
 
 // ---------- vaste stukken (originele markup) ----------
 
@@ -260,8 +265,8 @@ const linkStijl = 'class="menu-top media" style="display:inline;padding:0;text-i
 const agendaItem = (a) => {
   const titel = a.slug ? `<a class="menu-top media" style="display:inline;padding:0;text-indent:0;font-size:inherit;color:inherit" href="/${a.slug}.html">${esc(a.titel)}</a>` : esc(a.titel);
   const meta = [a.uur, a.locatie, a.opmerking].filter(Boolean).map(esc).join(" · ");
-  return `<div data-datum="${a.datum}">
-              <p class="inleiding" style="margin-bottom:2px">${formatDate(a.datum)} — ${titel}</p>
+  return `<div data-datum="${a.tot}">
+              <p class="inleiding" style="margin-bottom:2px">${formatPeriode(a)} — ${titel}</p>
               <p class="brood">${meta}${a.link ? `${meta ? " · " : ""}<a ${linkStijl} href="${esc(a.link)}" target="_blank">Info en tickets</a>` : ""}</p>
             </div>`;
 };
@@ -270,7 +275,7 @@ const agendaItem = (a) => {
 const perJaar = (items, render) => {
   let jaar = "", out = "";
   for (const a of items) {
-    const j = a.datum.slice(0, 4);
+    const j = a.tot.slice(0, 4);
     if (j !== jaar) { out += `<p class="hoofding-links" data-jaar="${j}" style="display:block;margin-top:18px">${j}</p>`; jaar = j; }
     out += render(a);
   }
@@ -291,13 +296,13 @@ function agendaInhoud() {
 // Speeldata onderaan een projectpagina
 const projectRegel = (a) => {
   const meta = [a.uur, a.locatie, a.opmerking].filter(Boolean).map(esc).join(" · ");
-  return `<p class="credits" data-datum="${a.datum}" style="margin-bottom:6px">${formatDate(a.datum)}${meta ? ` · ${meta}` : ""}${a.link ? ` · <a ${linkStijl} href="${esc(a.link)}" target="_blank">tickets</a>` : ""}</p>`;
+  return `<p class="credits" data-datum="${a.tot}" style="margin-bottom:6px">${formatPeriode(a)}${meta ? ` · ${meta}` : ""}${a.link ? ` · <a ${linkStijl} href="${esc(a.link)}" target="_blank">tickets</a>` : ""}</p>`;
 };
 function speeldataProject(p) {
   const eigen = agenda.filter((a) => a.titel === p.titel || a.slug === p.slug);
   if (!eigen.length) return "";
-  const komend = eigen.filter((a) => a.datum >= todayISO());
-  const voorbij = eigen.filter((a) => a.datum < todayISO()).reverse();
+  const komend = eigen.filter((a) => a.tot >= todayISO());
+  const voorbij = eigen.filter((a) => a.tot < todayISO()).reverse();
   const id = `archief-${p.slug}`;
   return `<div data-komend="${id}">
               <p class="credits-head" style="margin-top:25px">Speeldata</p>

@@ -56,6 +56,38 @@ function leesDatum(waarde) {
   return "";
 }
 
+// Meerdere dagen in één cel: "8 en 9/11/25", "29-30/11/25", "17,18,19/10/26", "14+15/10/26", "5-7/02/2027"
+// Geeft { datum (eerste dag), tot (laatste dag), dagen (tekst, bv. "8 en 9") } terug.
+function leesPeriode(waarde) {
+  if (typeof waarde !== "number" && !/^\d{4,5}(\.\d+)?$/.test(String(waarde ?? "").trim())) {
+    const s = String(waarde ?? "").trim().toLowerCase();
+    const m = s.match(/^((?:\d{1,2}\s*(?:-|–|en|&|\+|,)\s*)+\d{1,2})\s*[\/.\-]\s*(\d{1,2})\s*[\/.\-]\s*(\d{2,4})/);
+    if (m) {
+      const jaar = m[3].length === 2 ? "20" + m[3] : m[3];
+      const delen = m[1].split(/\s*(-|–|en|&|\+|,)\s*/);
+      let dagen = [], bereik = false;
+      for (let i = 0; i < delen.length; i += 2) {
+        const d = parseInt(delen[i], 10);
+        const vorigeSep = delen[i - 1];
+        if ((vorigeSep === "-" || vorigeSep === "–") && dagen.length) {
+          bereik = true;
+          for (let x = dagen[dagen.length - 1] + 1; x <= d; x++) dagen.push(x);
+        } else dagen.push(d);
+      }
+      dagen = [...new Set(dagen)].filter((d) => d >= 1 && d <= 31).sort((a, b) => a - b);
+      if (dagen.length) {
+        const eerste = dagen[0], laatste = dagen[dagen.length - 1];
+        const tekst = bereik && dagen.length > 2
+          ? `${eerste} – ${laatste}`
+          : dagen.length === 1 ? String(eerste) : `${dagen.slice(0, -1).join(", ")} en ${laatste}`;
+        return { datum: `${jaar}-${pad(m[2])}-${pad(eerste)}`, tot: `${jaar}-${pad(m[2])}-${pad(laatste)}`, dagen: tekst };
+      }
+    }
+  }
+  const d = leesDatum(waarde);
+  return { datum: d, tot: d, dagen: "" };
+}
+
 function leesUur(waarde) {
   if (waarde === undefined || waarde === null || waarde === "") return "";
   if (typeof waarde === "number" || /^0?\.\d+$/.test(String(waarde).trim())) return excelUur(waarde);
@@ -154,8 +186,11 @@ function rijenNaarData(rijen) {
     const o = {};
     velden.forEach((veld, i) => { if (veld && r[i] !== undefined && r[i] !== "") o[veld] = r[i]; });
     const plaats = [o.locatie, o.stad].filter((x) => x !== undefined && String(x).trim()).map((x) => String(x).trim()).join(", ");
+    const periode = leesPeriode(o.datum);
     return {
-      datum: leesDatum(o.datum),
+      datum: periode.datum,
+      tot: periode.tot,
+      dagen: periode.dagen,
       uur: leesUur(o.uur),
       locatie: plaats,
       link: o.link ? String(o.link).trim() : "",
@@ -170,4 +205,4 @@ function leesBestand(pad) {
   return rijenNaarData(leesCSV(buf.toString("utf8")));
 }
 
-module.exports = { leesBestand, leesDatum, leesUur };
+module.exports = { leesBestand, leesDatum, leesPeriode, leesUur };
