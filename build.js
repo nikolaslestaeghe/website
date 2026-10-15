@@ -188,6 +188,14 @@ const datumScript = `  <script>
         var teller = document.querySelector("[data-teller='" + archief.id + "']");
         if (teller) teller.textContent = archief.querySelectorAll("[data-datum]").length;
       }
+      // maanden die intussen leeg zijn verbergen, en de eerstvolgende maand openklappen
+      var maanden = komend.querySelectorAll("details[data-maand]"), eerste = true;
+      for (var m = 0; m < maanden.length; m++) {
+        var n = maanden[m].querySelectorAll("[data-datum]").length;
+        if (!n) { maanden[m].style.display = "none"; continue; }
+        var t = maanden[m].querySelector("[data-aantal]"); if (t) t.textContent = n;
+        if (eerste) { maanden[m].open = true; eerste = false; }
+      }
       if (!komend.querySelector("[data-datum]")) {
         var leeg = komend.querySelector("[data-leeg]");
         if (leeg) leeg.style.display = "";
@@ -309,10 +317,28 @@ const perJaar = (items, render) => {
   return groepen.map((g) => jaarBlok(g.j, g.items.map(render).join(""), g.items.length)).join("\n              ");
 };
 
+// Komende data per maand, elke maand openklapbaar (de eerste twee staan open)
+const MAANDEN_HOOFD = ["Januari", "Februari", "Maart", "April", "Mei", "Juni", "Juli", "Augustus", "September", "Oktober", "November", "December"];
+const perMaand = (items, render) => {
+  const groepen = [];
+  for (const a of items) {
+    const m = (a.datum < todayISO() ? a.tot : a.datum).slice(0, 7); // lopende reeks: onder de lopende maand
+    if (!groepen.length || groepen[groepen.length - 1].m !== m) groepen.push({ m, items: [] });
+    groepen[groepen.length - 1].items.push(a);
+  }
+  return groepen.map((g, i) => {
+    const [jaar, maand] = g.m.split("-");
+    return `<details data-maand="${g.m}"${i < 2 ? " open" : ""} style="margin-top:12px">
+                <summary class="hoofding-links" style="display:list-item;cursor:pointer">${MAANDEN_HOOFD[Number(maand) - 1]} ${jaar} <span style="color:rgba(0,0,0,.38)">(<span data-aantal>${g.items.length}</span>)</span></summary>
+                <div data-items style="margin-top:8px">${g.items.map(render).join("")}</div>
+              </details>`;
+  }).join("\n              ");
+};
+
 function agendaInhoud() {
   return `<div data-komend="archief-agenda">
               <p class="brood" data-leeg${upcoming.length ? ' style="display:none"' : ""}>Binnenkort nieuwe data. Abonneer je op de nieuwsbrief om niets te missen.</p>
-              ${upcoming.map(agendaItem).join("\n              ")}
+              ${perMaand(upcoming, agendaItem)}
             </div>
             <div data-archief${past.length ? "" : ' style="display:none"'}>
               <p class="credits-head" style="margin-top:35px">Archief</p>
