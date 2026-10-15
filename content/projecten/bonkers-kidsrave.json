@@ -1,19 +1,7 @@
 {
   "titel": "Bonkers kidsrave",
-  "kop": "",
-  "jaar": "",
-  "volgorde": 0,
   "zichtbaar": false,
-  "cover": "",
-  "achterfoto": "",
-  "tegelfoto": "",
-  "intro": "",
-  "tekst": "",
-  "citaat": "",
-  "credits": "",
-  "media": [],
-  "video": "",
-  "fotos": [],
-  "fotocredits": "",
-  "speellijst_bestand": "/bestanden/speellijst-Bonkers website.xlsx"
+  "tekst": "<p></p>",
+  "speellijst_bestand": "/bestanden/speellijst-Bonkers website-2.xlsx",
+  "volgorde": 0
 }
