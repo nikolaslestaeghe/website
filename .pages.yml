@@ -1,0 +1,224 @@
+# Instellingen voor de beheerpagina (Pages CMS, https://app.pagescms.org)
+# Hier staat welke formulieren je ziet en waar alles wordt bewaard.
+
+media:
+  - name: images
+    label: Foto's
+    input: static/images
+    output: /images
+    categories: [image]
+
+content:
+  # ---------- Projecten ----------
+  - name: projecten
+    label: Projecten
+    type: collection
+    path: content/projecten
+    format: json
+    filename: "{primary}.json"
+    view:
+      primary: titel
+      fields: [titel, jaar, zichtbaar]
+      sort: jaar
+      order: desc
+    fields:
+      - name: titel
+        label: Titel
+        type: string
+        required: true
+      - name: kop
+        label: Titel op de foto (optioneel)
+        type: text
+        description: "Leeg = gewone titel. Een Enter maakt een nieuwe regel, bv. Loopgraven- / operette."
+      - name: jaar
+        label: Jaar
+        type: string
+        description: "Bv. 2024 of 2023 – 2025. Het laatste jaartal bepaalt de volgorde op de site."
+      - name: zichtbaar
+        label: Zichtbaar op de site
+        type: boolean
+        default: true
+        description: "Zet uit om een project voorlopig te verbergen."
+      - name: cover
+        label: Grote foto bovenaan
+        type: image
+        options:
+          media: images
+      - name: achterfoto
+        label: Foto achter 'In beeld'
+        type: image
+        options:
+          media: images
+      - name: tegelfoto
+        label: Foto op de projectenpagina
+        type: image
+        description: "Leeg = de grote foto bovenaan."
+        options:
+          media: images
+      - name: intro
+        label: Inleiding (groot gedrukt)
+        type: text
+      - name: tekst
+        label: Tekst
+        type: rich-text
+        options:
+          format: html
+          media: images
+      - name: citaat
+        label: Citaat of recensie (optioneel)
+        type: text
+      - name: credits
+        label: Credits
+        type: text
+        description: "Eén rol per regel, bv. 'Spel: ...'"
+      - name: video
+        label: Videolink (YouTube of Vimeo, optioneel)
+        type: string
+      - name: fotos
+        label: Foto's
+        type: image
+        options:
+          media: images
+          multiple:
+            max: 40
+      - name: fotocredits
+        label: Fotocredits
+        type: string
+      - name: media
+        label: Links (rechterkolom)
+        type: object
+        list: true
+        fields:
+          - name: titel
+            label: Tekst van de link
+            type: string
+          - name: link
+            label: Adres (https://...)
+            type: string
+          - name: afbeelding
+            label: Logo in plaats van tekst (optioneel)
+            type: image
+            options:
+              media: images
+      - name: volgorde
+        label: Volgorde binnen hetzelfde jaar (optioneel)
+        type: number
+        description: "Hoger getal = eerder in de lijst. Meestal mag je dit leeg laten."
+
+  # ---------- Agenda ----------
+  - name: agenda
+    label: Agenda
+    type: collection
+    path: content/agenda
+    format: json
+    filename: "{year}-{month}-{day}-{primary}.json"
+    view:
+      primary: titel
+      fields: [datum, titel, locatie]
+      sort: datum
+      order: desc
+    fields:
+      - name: datum
+        label: Datum
+        type: date
+        required: true
+      - name: titel
+        label: Titel
+        type: string
+        required: true
+      - name: uur
+        label: Uur (optioneel)
+        type: string
+      - name: locatie
+        label: Plaats
+        type: string
+        description: "Bv. CC Belgica, Dendermonde"
+      - name: link
+        label: Link voor info of tickets (optioneel)
+        type: string
+      - name: project
+        label: Bijhorend project (optioneel)
+        type: reference
+        options:
+          collection: projecten
+          search: titel
+          value: "{path}"
+          label: "{titel}"
+        description: "Koppelt de voorstelling aan een projectpagina."
+
+  # ---------- Losse pagina's ----------
+  - name: biografie
+    label: Biografie
+    type: file
+    path: content/biografie.json
+    format: json
+    fields:
+      - name: kop
+        label: Titel op de foto
+        type: text
+      - name: portret
+        label: Foto bovenaan
+        type: image
+        options:
+          media: images
+      - name: intro
+        label: Inleiding (groot gedrukt)
+        type: text
+      - name: tekst
+        label: Tekst
+        type: rich-text
+        options:
+          format: html
+      - name: media
+        label: Links (rechterkolom)
+        type: object
+        list: true
+        fields:
+          - name: titel
+            label: Tekst van de link
+            type: string
+          - name: link
+            label: Adres
+            type: string
+
+  - name: site
+    label: Algemene gegevens
+    type: file
+    path: content/site.json
+    format: json
+    fields:
+      - name: naam
+        label: Naam
+        type: string
+      - name: omschrijving
+        label: Korte omschrijving (voorpagina)
+        type: text
+      - name: email
+        label: E-mail
+        type: string
+      - name: telefoon
+        label: Telefoon
+        type: string
+      - name: links
+        label: Extra links onderaan (bv. Instagram)
+        type: object
+        list: true
+        fields:
+          - name: titel
+            type: string
+          - name: link
+            type: string
+      - name: nieuwsbrief
+        label: Inschrijfformulier nieuwsbrief tonen
+        type: boolean
+      - name: achtergrond_home
+        label: Foto op de voorpagina
+        type: image
+        options:
+          media: images
+      - name: ontwerp
+        label: Vermelding webontwerp
+        type: string
+      - name: ontwerp_link
+        label: Link webontwerper
+        type: string

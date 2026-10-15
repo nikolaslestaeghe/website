@@ -1,0 +1,27 @@
+{
+  "titel": "HUT (I)",
+  "kop": "HUT (I)",
+  "jaar": "2011",
+  "volgorde": 1,
+  "zichtbaar": true,
+  "cover": "/images/01_4.jpg",
+  "achterfoto": "/images/04_4.jpg",
+  "tegelfoto": "/images/04 kopie.jpg",
+  "intro": "Zonder het te willen is een jongen\neen grote mens geworden.",
+  "tekst": "<p>Hij heeft nu een grote-mensen-leven<br>in een grote-mensen-huis<br>ver weg van zijn kleine-jongens-thuis.<br>Vandaag bouwt hij zijn boomhut opnieuw,<br>en voor even beleeft de grote mens<br>opnieuw zijn kleine hutverhaal.</p>",
+  "citaat": "",
+  "credits": "Concept en regie: Nikolas Lestaeghe",
+  "media": [
+    {
+      "titel": "Malpertuis",
+      "link": "http://www.malpertuis.be"
+    },
+    {
+      "titel": "Halfmoon files",
+      "link": "http://halfmoonfiles.de/en"
+    }
+  ],
+  "video": "https://www.youtube.com/watch?v=HV_yHweGFak",
+  "fotos": [],
+  "fotocredits": "Foto's: Nikolas Lestaeghe, Pieterjan Volckaert, Dorien Van Vooren"
+}

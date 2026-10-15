@@ -1,0 +1,27 @@
+{
+  "titel": "Rosalie",
+  "kop": "Rosalie",
+  "jaar": "2010",
+  "volgorde": 0,
+  "zichtbaar": true,
+  "cover": "/images/10.jpg",
+  "achterfoto": "/images/04_1.jpg",
+  "tegelfoto": "/images/02_3.jpg",
+  "intro": "Rosalie is een mevrouw van 4,75 meter.",
+  "tekst": "<p>Ze heeft een kleed aan, een trouwkleed. Dat moet wel want vandaag is het de trouwdag van Rosalie. Het is een trouwfeest met alles erop en eraan: vele gasten, champagne, muziek, vuurwerk, confetti en een gigantische huwelijkstaart. Helaas loopt het feest niet zoals het zou moeten. Als overmaat van ramp begint de machinerie te smelten, haar lichaam (bestaande uit een binnenbouw van drie verdiepingen) ziet wit van de rook, de elektriciteitskabels raken vochtig door het vruchtwater en snel ontploft Rosalie en het huwelijk dat een meneer had gebouwd…</p>",
+  "citaat": "“Never seen such a beautiful and bizarre bride and groom! Mooie combinatie van stunteligheid, onhandigheid en timing. Ik wens ze een lang en gelukkig leven!” (Hans Bryssinck)",
+  "credits": "Concept: Nikolas Lestaeghe\nSpel: Nikolas Lestaeghe, Lucas Verbrugge, Bram Lievens\nTechniek: Lucas Verbrugge, Bram Lievens",
+  "media": [
+    {
+      "titel": "Malpertuis",
+      "link": "http://www.malpertuis.be"
+    },
+    {
+      "titel": "Halfmoon files",
+      "link": "http://halfmoonfiles.de/en"
+    }
+  ],
+  "video": "",
+  "fotos": [],
+  "fotocredits": "Foto's: Nikolas Lestaeghe, Dorien Van Vooren"
+}

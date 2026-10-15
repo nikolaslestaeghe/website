@@ -1,0 +1,34 @@
+{
+  "titel": "Groet #2",
+  "kop": "Groet #2",
+  "jaar": "2013",
+  "volgorde": 0,
+  "zichtbaar": true,
+  "cover": "/images/01_1.jpg",
+  "achterfoto": "/images/06_1.jpg",
+  "tegelfoto": "/images/01_3.jpg",
+  "intro": "",
+  "tekst": "<p>Een wankele kapel, een plastic trompet en een goedkoop koffiezetapparaat. Met beperkte middelen geeft Nikolas Lestaeghe een nieuwe invulling aan gebruiken en tradities.<br>Hij vertelt een verhaal zonder te praten. Met kartonnen acteurs brengt hij op een beeldende en persoonlijke manier een solo over omgaan met verlies, tradities en afkomst.</p>\n<p>Met dank aan: Rits, Harry Cole en De Maan, figurentheater</p>",
+  "citaat": "",
+  "credits": "Concept/spel: Nikolas Lestaeghe\nTechniek/lichtontwerp: Marcel Van Damme",
+  "media": [
+    {
+      "titel": "Malpertuis",
+      "link": "http://www.malpertuis.be/gastproducties/218/"
+    }
+  ],
+  "video": "https://vimeo.com/70314393",
+  "fotos": [
+    "/images/01_1.jpg",
+    "/images/02_2.jpg",
+    "/images/03_1.jpg",
+    "/images/04_2.jpg",
+    "/images/05_1.jpg",
+    "/images/06_1.jpg",
+    "/images/07_2.jpg",
+    "/images/08_1.jpg",
+    "/images/09_1.jpg",
+    "/images/10_1.jpg"
+  ],
+  "fotocredits": "Foto's: Marc Vandermeulen · Filmstills: Nikolas Lestaeghe"
+}
