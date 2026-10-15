@@ -161,13 +161,23 @@ const datumScript = `  <script>
       for (var j = 0; j < items.length; j++) {
         var d = items[j].getAttribute("data-datum");
         if (d < vandaag) {
-          var jaar = archief.querySelector("[data-jaar='" + d.slice(0, 4) + "']");
-          if (!jaar && archief.querySelector("[data-jaar]")) {
-            jaar = archief.querySelector("[data-jaar]").cloneNode(false);
-            jaar.setAttribute("data-jaar", d.slice(0, 4)); jaar.textContent = d.slice(0, 4);
+          var jaar = archief.querySelector("details[data-jaar='" + d.slice(0, 4) + "']");
+          if (!jaar && archief.querySelector("details[data-jaar]")) {
+            jaar = archief.querySelector("details[data-jaar]").cloneNode(true);
+            jaar.removeAttribute("open");
+            jaar.setAttribute("data-jaar", d.slice(0, 4));
+            jaar.querySelector("summary").firstChild.nodeValue = d.slice(0, 4) + " ";
+            jaar.querySelector("[data-items]").innerHTML = "";
             archief.insertBefore(jaar, archief.firstChild);
           }
-          archief.insertBefore(items[j], jaar ? jaar.nextSibling : archief.firstChild);
+          if (jaar) {
+            var lijst = jaar.querySelector("[data-items]");
+            lijst.insertBefore(items[j], lijst.firstChild);
+            var tel = jaar.querySelector("[data-aantal]");
+            if (tel) tel.textContent = lijst.querySelectorAll("[data-datum]").length;
+          } else {
+            archief.insertBefore(items[j], archief.firstChild);
+          }
           verplaatst++;
         }
       }
@@ -272,14 +282,19 @@ const agendaItem = (a) => {
 };
 
 // Archief, gegroepeerd per jaar
+// Archief per jaar, elk jaar openklapbaar
+const jaarBlok = (j, inhoud, aantal) => `<details data-jaar="${j}" style="margin-top:12px">
+                <summary class="hoofding-links" style="display:list-item;cursor:pointer">${j} <span style="color:rgba(0,0,0,.38)">(<span data-aantal>${aantal}</span>)</span></summary>
+                <div data-items style="margin-top:8px">${inhoud}</div>
+              </details>`;
 const perJaar = (items, render) => {
-  let jaar = "", out = "";
+  const groepen = [];
   for (const a of items) {
     const j = a.tot.slice(0, 4);
-    if (j !== jaar) { out += `<p class="hoofding-links" data-jaar="${j}" style="display:block;margin-top:18px">${j}</p>`; jaar = j; }
-    out += render(a);
+    if (!groepen.length || groepen[groepen.length - 1].j !== j) groepen.push({ j, items: [] });
+    groepen[groepen.length - 1].items.push(a);
   }
-  return out;
+  return groepen.map((g) => jaarBlok(g.j, g.items.map(render).join(""), g.items.length)).join("\n              ");
 };
 
 function agendaInhoud() {
