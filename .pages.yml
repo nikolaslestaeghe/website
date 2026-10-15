@@ -246,6 +246,10 @@ content:
       - name: nieuwsbrief
         label: Inschrijfformulier nieuwsbrief tonen
         type: boolean
+      - name: nieuwsbrief_url
+        label: Brevo-formulierlink
+        type: string
+        description: "De link van je inschrijfformulier in Brevo (begint met https:// en bevat sibforms.com)."
       - name: achtergrond_home
         label: Foto op de voorpagina
         type: image

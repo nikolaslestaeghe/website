@@ -218,15 +218,26 @@ const footer = () => `  <div class="republiek-createdbalk">
           ${asArray(site.links).map((l) => `<a class="telefoon" href="${esc(l.link)}" target="_blank">${esc(l.titel)}</a>`).join("")}
         </div>
         <div class="w-col w-col-7">
-          ${site.nieuwsbrief !== false ? `<p>Abonneer je op Nikolas’ onregelmatige nieuwsbrief&nbsp;</p>
+          ${site.nieuwsbrief !== false && site.nieuwsbrief_url ? `<p>Abonneer je op Nikolas’ onregelmatige nieuwsbrief&nbsp;</p>
           <div>
-            <form class="form" id="email-form" name="nieuwsbrief" method="POST" action="/bedankt.html" data-netlify="true" netlify-honeypot="bot-veld">
-              <input type="hidden" name="form-name" value="nieuwsbrief">
-              <p style="display:none"><label>Niet invullen: <input name="bot-veld"></label></p>
-              <input class="w-input" id="email" type="email" placeholder="E-mailadres..." name="email" required="required">
+            <form class="form" id="email-form" method="POST" action="${esc(site.nieuwsbrief_url)}" onsubmit="return nieuwsbrief(this)">
+              <input type="text" name="email_address_check" value="" tabindex="-1" autocomplete="off" style="display:none">
+              <input type="hidden" name="locale" value="nl">
+              <input class="w-input" id="email" type="email" placeholder="E-mailadres..." name="EMAIL" required="required">
               <input class="w-button form-button" type="submit" value="Verstuur">
             </form>
-          </div>` : `<span id="email-form"></span>`}
+            <div class="gelukt" style="display:none;padding:10px 15px;margin-bottom:19px"><p style="margin:0">Dank je wel! Bevestig je inschrijving via de mail die je zo dadelijk krijgt.</p></div>
+          </div>
+          <script>
+            function nieuwsbrief(f) {
+              if (!window.fetch || !window.FormData) return true; // oude browser: gewoon versturen
+              fetch(f.action, { method: "POST", body: new FormData(f), mode: "no-cors" }).finally(function () {
+                f.style.display = "none";
+                f.nextElementSibling.style.display = "";
+              });
+              return false;
+            }
+          </script>` : `<span id="email-form"></span>`}
         </div>
         <div class="w-col w-col-2">
           <p>Webontwerp</p>${site.ontwerp_link ? `<a class="ontwerper" href="${esc(site.ontwerp_link)}" target="_blank">${esc(site.ontwerp)}</a>` : `<span class="ontwerper">${esc(site.ontwerp || "")}</span>`}
