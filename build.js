@@ -304,7 +304,7 @@ const agendaItem = (a) => {
 // Archief, gegroepeerd per jaar
 // Archief per jaar, elk jaar openklapbaar
 const jaarBlok = (j, inhoud, aantal) => `<details data-jaar="${j}" style="margin-top:12px">
-                <summary class="hoofding-links" style="display:list-item;cursor:pointer">${j} <span style="color:rgba(0,0,0,.38)">(<span data-aantal>${aantal}</span>)</span></summary>
+                <summary class="hoofding-links" style="display:list-item;cursor:pointer">${j}</summary>
                 <div data-items style="margin-top:8px">${inhoud}</div>
               </details>`;
 const perJaar = (items, render) => {
@@ -329,7 +329,7 @@ const perMaand = (items, render) => {
   return groepen.map((g, i) => {
     const [jaar, maand] = g.m.split("-");
     return `<details data-maand="${g.m}"${i < 2 ? " open" : ""} style="margin-top:12px">
-                <summary class="hoofding-links" style="display:list-item;cursor:pointer">${MAANDEN_HOOFD[Number(maand) - 1]} ${jaar} <span style="color:rgba(0,0,0,.38)">(<span data-aantal>${g.items.length}</span>)</span></summary>
+                <summary class="hoofding-links" style="display:list-item;cursor:pointer">${MAANDEN_HOOFD[Number(maand) - 1]} ${jaar}</summary>
                 <div data-items style="margin-top:8px">${g.items.map(render).join("")}</div>
               </details>`;
   }).join("\n              ");
