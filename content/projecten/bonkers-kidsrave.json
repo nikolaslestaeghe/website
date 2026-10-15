@@ -1,7 +1,35 @@
 {
   "titel": "Bonkers kidsrave",
-  "zichtbaar": false,
-  "tekst": "<p></p>",
+  "kop": "Bonkers kidsrave",
+  "jaar": "2025",
+  "zichtbaar": true,
+  "cover": "/images/54930227175_713b497cf4_c-2.jpg",
+  "achterfoto": "/images/54929052512_42968236eb_c-2.jpg",
+  "tegelfoto": "/images/54929052512_42968236eb_c-2-1.jpg",
+  "intro": "Ouders niet toegelaten!”\nzegt een buitenwipper aan de deur,\n“deze club is enkel voor kinderen”.\n(volwassenen passen er nu eenmaal niet in met hun grote lijven)\n\nDe beukende beats zijn tot buiten te horen en de stoom komt langs kieren naar buiten. Kleine feestbeesten rukken zich voor het eerst los van het ouderlijke gezag.",
+  "tekst": "<p>Welkom bij&nbsp;<em>Bonkers Kidsrave</em>, een nomadische club voor feestgangers vanaf 5 jaar. Installatie, nachtclub, theatrale ervaring en online radio:&nbsp;<em>Bonkers Kidsrave</em>&nbsp;is het allemaal. Maar bovenal is het een speelse verkenning van de volwassen wereld en het leren loslaten. Binnen knallen experimentele gabbermuziek, meeslepende eurodance en verdovende dub door de speakers. Rook -en bubbelmachines draaien op volle toeren. Te wild? Geen zorgen: interactieve elementen helpen de jonge ravers hun eigen ritme te vinden in een wereld die speciaal voor hen is gemaakt.</p><p>Muzikaal zijn er geen compromissen want de DJ’s zijn allemaal professioneel. De line-up van de dag kun je vinden aan de club en op de socials van&nbsp;<em>Bonkers Kidsrave</em>. En het feest stopt daar niet: elke dj-set wordt opgeladen naar het online platform&nbsp;<a href=\"http://bonkers-kidsrave.be\"><u>bonkers-kidsrave.be</u></a>&nbsp;zodat het feest thuis kan doorgaan, deze keer mét de ouders erbij.</p>",
+  "credits": "concept: Jonathan Cant, Casimir Franken & Nikolas Lestaeghe\nuitvoering: Jonathan Cant, Laura Conant, Casimir Franken, Dhiyab Miloudi & Nikolas Lestaeghe\ndecor: Casimir Franken, Xander Houben, Nikolas Lestaeghe & Bert Maesen\ngrafisch ontwerp & website: Laura Conant\nproductie: More is More vzw\ncoproductie: C-TAKT, Musica & Zonzo Compagnie\nmet dank aan: BRONKS & Het Bos\nmet steun van: De Vlaamse Gemeenschap & De Vlaamse Gemeenschapscommissie",
+  "video": "https://vimeo.com/1168035370?fl=pl&fe=sh",
   "speellijst_bestand": "/bestanden/speellijst-Bonkers website-2.xlsx",
+  "fotos": [
+    "/images/54929052512_42968236eb_c-2-2.jpg",
+    "/images/54930227175_713b497cf4_c-2-1.jpg",
+    "/images/IMG_2432 2.jpg"
+  ],
+  "fotocredits": "Karolina Maruszak",
+  "media": [
+    {
+      "titel": "Zonzo Compagnie",
+      "link": "https://www.zonzocompagnie.be/nl"
+    },
+    {
+      "titel": "Musica Impulscentrum",
+      "link": "https://www.musica.be/nl/"
+    },
+    {
+      "titel": "C-Takt",
+      "link": "https://www.c-takt.be/en/"
+    }
+  ],
   "volgorde": 0
 }
