@@ -77,6 +77,21 @@ const formatPeriode = (a) => {
   return `${a.dagen} ${MAANDEN[d.getMonth()]} ${d.getFullYear()}`;
 };
 
+// ---------- te grote bestanden ----------
+// Cloudflare publiceert geen bestanden groter dan 25 MB. Zo'n bestand zou de hele site blokkeren,
+// dus we laten het weg en melden het in het logboek.
+const MAX_BYTES = 25 * 1024 * 1024 - 64 * 1024;
+const teGroot = new Set();
+(function zoek(dir) {
+  for (const naam of fs.readdirSync(dir)) {
+    const vol = path.join(dir, naam);
+    const st = fs.statSync(vol);
+    if (st.isDirectory()) zoek(vol);
+    else if (st.size > MAX_BYTES) teGroot.add("/" + path.relative(STATIC, vol).split(path.sep).join("/"));
+  }
+})(STATIC);
+const mb = (bytes) => (bytes / 1024 / 1024).toFixed(0);
+
 // ---------- inhoud ----------
 
 const site = readJSON(path.join(CONTENT, "site.json"));
@@ -418,6 +433,7 @@ projects.forEach((p, i) => {
   const nieuwer = projects[(i - 1 + n) % n]; // rechts
   const fotos = asArray(p.fotos);
   const embed = videoEmbed(p.video);
+  const videoBestand = p.video_bestand && !teGroot.has(p.video_bestand) ? p.video_bestand : "";
   const top = p.cover || fotos[0];
   const achter = p.achterfoto || fotos[1] || top;
 
@@ -479,6 +495,12 @@ ${embed ? `      <div class="w-row republiek-uitleg">
           </div>
         </div>
       </div>` : ""}
+${videoBestand ? `      <div class="w-row republiek-uitleg">
+        <div class="w-col w-col-3 w-hidden-medium w-hidden-small w-hidden-tiny"></div>
+        <div class="w-col w-col-9">
+          <video src="${esc(videoBestand)}" controls playsinline preload="metadata"${p.video_poster ? ` poster="${esc(p.video_poster)}"` : ""} style="display:block;width:100%;height:auto;aspect-ratio:auto 16 / 9;background:#000"></video>
+        </div>
+      </div>` : ""}
 ${fotos.length ? `      <div class="w-slider republiek-slider" data-animation="slide" data-duration="500" data-infinite="1">
         <div class="w-slider-mask">
 ${fotos.map((f) => `          <div class="w-slide">
@@ -493,7 +515,7 @@ ${fotos.map((f) => `          <div class="w-slide">
         </div>
         <div class="w-slider-nav w-round"></div>
       </div>` : ""}
-${!fotos.length && !embed ? kleineRegel("Binnenkort meer foto’s") : !fotos.length ? kleineRegel("Binnenkort meer foto’s") : ""}
+${!fotos.length && !embed && !videoBestand ? kleineRegel("Binnenkort meer foto’s") : ""}
 ${p.fotocredits ? kleineRegel(p.fotocredits) : ""}
     </div>
 ${footer()}
@@ -566,7 +588,11 @@ pages["404.html"] = eenvoudig("Oeps", `<p class="brood">Deze pagina bestaat niet
 
 fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(OUT, { recursive: true });
-fs.cpSync(STATIC, OUT, { recursive: true });
+fs.cpSync(STATIC, OUT, {
+  recursive: true,
+  filter: (src) => !teGroot.has("/" + path.relative(STATIC, src).split(path.sep).join("/")),
+});
+teGroot.forEach((f) => waarschuwingen.push(`${f} is groter dan 25 MB (${mb(fs.statSync(path.join(STATIC, f)).size)} MB) en wordt niet gepubliceerd. Maak het bestand kleiner of gebruik een YouTube- of Vimeo-link.`));
 for (const [file, html] of Object.entries(pages)) fs.writeFileSync(path.join(OUT, file), html);
 
 const missing = new Set();

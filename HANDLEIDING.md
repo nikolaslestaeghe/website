@@ -36,6 +36,7 @@ Tips:
 - Werk je nog aan een project? Zet **Zichtbaar op de site** uit tot het klaar is.
 - Er staan al drie verborgen projecten klaar: *Attraction Park Under Construction*, *Bonkers kidsrave* en *The Introverse*.
 - Foto's: liefst liggend, jpg, ongeveer 2000 pixels breed.
+- Video: plak een YouTube- of Vimeo-link, of laad een **.mp4-bestand** op bij *Of een videobestand van je computer*. Maximaal 25 MB (± 1 à 2 minuten). Een groter bestand wordt niet gepubliceerd; de rest van de site werkt dan gewoon verder. Maak de video kleiner (bv. met HandBrake of via *Bestand → Exporteer* in QuickTime, 720p) of gebruik YouTube/Vimeo.
 
 ## Speellijsten en agenda
 

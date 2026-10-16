@@ -7,6 +7,11 @@ media:
     input: static/images
     output: /images
     categories: [image]
+  - name: videos
+    label: Video's
+    input: static/videos
+    output: /videos
+    extensions: [mp4, webm]
   - name: bestanden
     label: Speellijsten
     input: static/bestanden
@@ -79,6 +84,18 @@ content:
       - name: video
         label: Videolink (YouTube of Vimeo, optioneel)
         type: string
+      - name: video_bestand
+        label: Of een videobestand van je computer (optioneel)
+        description: "Enkel .mp4, maximaal 25 MB (± 1 à 2 minuten in goede kwaliteit). Voor langere video's gebruik je beter YouTube of Vimeo."
+        type: file
+        options:
+          media: videos
+      - name: video_poster
+        label: Startbeeld van de video (optioneel)
+        description: "De foto die getoond wordt voor de video start. Leeg = het eerste beeld van de video."
+        type: image
+        options:
+          media: images
       - name: speellijst
         label: Speellijst
         description: "Voeg per voorstelling een datum toe. Voorbije data blijven zichtbaar onder 'Eerder gespeeld' en in het agenda-archief."
