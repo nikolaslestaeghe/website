@@ -68,14 +68,7 @@ const videoEmbed = (url) => {
   return "";
 };
 
-const MAANDEN = ["januari", "februari", "maart", "april", "mei", "juni", "juli", "augustus", "september", "oktober", "november", "december"];
-const formatDate = (iso) => { const d = new Date(iso + "T12:00:00"); return isNaN(d) ? esc(iso) : `${d.getDate()} ${MAANDEN[d.getMonth()]} ${d.getFullYear()}`; };
 const todayISO = () => new Date().toISOString().slice(0, 10);
-const formatPeriode = (a) => {
-  if (!a.dagen || a.tot === a.datum) return formatDate(a.datum);
-  const d = new Date(a.datum + "T12:00:00");
-  return `${a.dagen} ${MAANDEN[d.getMonth()]} ${d.getFullYear()}`;
-};
 
 // ---------- te grote bestanden ----------
 // Cloudflare publiceert geen bestanden groter dan 25 MB. Zo'n bestand zou de hele site blokkeren,
@@ -111,7 +104,7 @@ const voegToe = (d, extra) => {
   speeldata.push({ ...periode, uur: d.uur ? leesUur(d.uur) : "", locatie: d.locatie || "", link: d.link || "", opmerking: d.opmerking || "", ...extra });
 };
 for (const p of alleProjecten) {
-  const extra = { titel: p.titel, slug: p.zichtbaar === false ? null : p.slug };
+  const extra = { titel: p.titel, titel_en: (p.en && p.en.titel) || "", slug: p.zichtbaar === false ? null : p.slug };
   asArray(p.speellijst).forEach((d) => voegToe(d, extra));
   if (p.speellijst_bestand) {
     const bestand = path.join(STATIC, p.speellijst_bestand.replace(/^\//, ""));
@@ -127,7 +120,7 @@ for (const p of alleProjecten) {
 for (const a of readCollection("agenda")) {
   const key = String(a.project || "").split("/").pop().replace(/\.json$/, "");
   const proj = key && alleProjecten.find((p) => p.slug === key);
-  voegToe(a, { titel: a.titel || (proj && proj.titel) || "", slug: proj && proj.zichtbaar !== false ? proj.slug : null });
+  voegToe(a, { titel: a.titel || (proj && proj.titel) || "", titel_en: a.titel_en || (!a.titel && proj && proj.en && proj.en.titel) || "", slug: proj && proj.zichtbaar !== false ? proj.slug : null });
 }
 // dubbels weglaten, sorteren op datum en uur
 const gezien = new Set();
@@ -137,31 +130,9 @@ const agenda = speeldata
 const upcoming = agenda.filter((a) => a.tot >= todayISO());
 const past = agenda.filter((a) => a.tot < todayISO()).reverse();
 
-// ---------- vaste stukken (originele markup) ----------
+const SITE_URL = "https://www.nikolaslestaeghe.com";
 
-const head = (title) => `<!DOCTYPE html>
-<!-- Oorspronkelijk ontwerp: Pieterjan Volckaert (Webflow) -->
-<html lang="nl">
-<head>
-  <meta charset="utf-8">
-  <title>${esc(site.naam)}${title ? ` - ${esc(title)}` : ""}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" type="text/css" href="/css/normalize.css">
-  <link rel="stylesheet" type="text/css" href="/css/webflow.css">
-  <link rel="stylesheet" type="text/css" href="/css/nikolaslestaeghenoimages.webflow.css">
-  <link rel="stylesheet" type="text/css" href="/css/aanvullingen.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js"></script>
-  <script>
-    if (window.WebFont) WebFont.load({
-      google: {
-        families: ["Montserrat:400,700"]
-      }
-    });
-  </script>
-  <script type="text/javascript" src="/js/modernizr.js"></script>
-  <link rel="shortcut icon" type="image/x-icon" href="https://daks2k3a4ib2z.cloudfront.net/placeholder/favicon.ico">
-</head>
-<body>`;
+// ---------- scripts onderaan elke pagina ----------
 
 // Verschuift data die intussen voorbij zijn naar het archief, telkens iemand de pagina bekijkt.
 // Zo blijft de agenda juist, ook als de site een tijd niet opnieuw gebouwd werd.
@@ -226,31 +197,136 @@ const scripts = `${datumScript}
 </html>
 `;
 
-const menu = (extra = "", naamLink = "/biografie.html", contact = true) =>
-  `<div class="republiek-absoluut${extra ? " " + extra : ""}"><a class="menu-top${extra === "" ? "" : ""}" href="${naamLink}">${esc(site.naam)}</a><a class="menu-top" href="/projecten.html">Projecten</a><a class="menu-top" href="/agenda.html">Agenda</a>${contact ? `<a class="menu-top" href="#email-form">Contact</a>` : ""}
+// ---------- talen ----------
+// Nederlands staat op de gewone adressen (/giros-5.html), Engels onder /en/ (/en/giros-5.html).
+// Velden met "_en" achteraan (titel_en, tekst_en, ...) zijn de Engelse versie.
+// Is een Engels veld leeg, dan toont de Engelse site de Nederlandse tekst.
+
+const TALEN = {
+  nl: {
+    code: "nl", pre: "", ander: "en", anderLabel: "EN", anderNaam: "English",
+    projecten: "Projecten", agenda: "Agenda", contact: "Contact", biografie: "Biografie", home: "Home",
+    inBeeld: "IN\n            <br>BEELD", media: "Media", credits: "Credits",
+    speeldata: "Speeldata", geenGepland: "Momenteel geen geplande voorstellingen.", eerderGespeeld: "Eerder gespeeld",
+    archief: "Archief", agendaLeeg: "Binnenkort nieuwe data. Abonneer je op de nieuwsbrief om niets te missen.",
+    infoTickets: "Info en tickets", tickets: "tickets", meerFotos: "Binnenkort meer foto’s",
+    email: "E-mail", telefoon: "Telefoon", nbTitel: "Abonneer je op Nikolas’ onregelmatige nieuwsbrief",
+    nbVeld: "E-mailadres...", nbKnop: "Verstuur", nbDank: "Dank je wel! Bevestig je inschrijving via de mail die je zo dadelijk krijgt.",
+    webontwerp: "Webontwerp", en: " en ",
+    maanden: ["januari", "februari", "maart", "april", "mei", "juni", "juli", "augustus", "september", "oktober", "november", "december"],
+    maandenHoofd: ["Januari", "Februari", "Maart", "April", "Mei", "Juni", "Juli", "Augustus", "September", "Oktober", "November", "December"],
+    datum: (d, m, j) => `${d} ${m} ${j}`,
+    bedanktTitel: "Dank je wel!", bedanktTekst: (pre) => `We hebben je adres ontvangen. <a href="${pre}/" style="color:#4778ff">Terug naar de voorpagina</a>.`,
+    nietGevondenTitel: "Oeps", nietGevondenTekst: (pre) => `Deze pagina bestaat niet (meer). Bekijk de <a href="${pre}/projecten.html" style="color:#4778ff">projecten</a>.`,
+    opmerkingen: {},
+  },
+  en: {
+    code: "en", pre: "/en", ander: "nl", anderLabel: "NL", anderNaam: "Nederlands",
+    projecten: "Projects", agenda: "Agenda", contact: "Contact", biografie: "Biography", home: "Home",
+    inBeeld: "IN\n            <br>PICTURES", media: "Media", credits: "Credits",
+    speeldata: "Dates", geenGepland: "No performances scheduled at the moment.", eerderGespeeld: "Past performances",
+    archief: "Archive", agendaLeeg: "New dates coming soon. Subscribe to the newsletter so you don’t miss a thing.",
+    infoTickets: "Info and tickets", tickets: "tickets", meerFotos: "More photos coming soon",
+    email: "E-mail", telefoon: "Phone", nbTitel: "Subscribe to Nikolas’ irregular newsletter",
+    nbVeld: "E-mail address...", nbKnop: "Send", nbDank: "Thank you! Please confirm your subscription via the e-mail you will receive shortly.",
+    webontwerp: "Web design", en: " and ",
+    maanden: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    maandenHoofd: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    datum: (d, m, j) => `${d} ${m} ${j}`,
+    bedanktTitel: "Thank you!", bedanktTekst: (pre) => `We have received your address. <a href="${pre}/" style="color:#4778ff">Back to the homepage</a>.`,
+    nietGevondenTitel: "Oops", nietGevondenTekst: (pre) => `This page does not exist (anymore). Have a look at the <a href="${pre}/projecten.html" style="color:#4778ff">projects</a>.`,
+    // Veelvoorkomende opmerkingen uit speellijsten (kleine letters)
+    opmerkingen: {
+      "schoolvoorstelling": "school performance", "schoolvoorstellingen": "school performances",
+      "premiere": "premiere", "première": "premiere", "avant-première": "preview", "try-out": "try-out", "tryout": "try-out",
+      "uitverkocht": "sold out", "volzet": "sold out", "geannuleerd": "cancelled", "afgelast": "cancelled", "cancelled": "cancelled",
+      "toonmoment": "showing", "familievoorstelling": "family performance", "gratis": "free", "première!": "premiere!",
+    },
+  },
+};
+
+function bouwTaal(L) {
+  const P = L.pre; // voorvoegsel voor interne links
+  const vertaling = (obj, veld) => {
+    if (!obj) return "";
+    const v = obj.en && typeof obj.en === "object" ? obj.en[veld] : obj[veld + "_en"];
+    return String(v ?? "").replace(/<p>\s*<\/p>/g, "").trim() ? v : "";
+  };
+  const tr = (obj, veld) => (L.code === "en" && vertaling(obj, veld) ? vertaling(obj, veld) : obj ? obj[veld] : "");
+  const titelVan = (p) => tr(p, "titel");
+  const kop = (p) => {
+    const en = L.code === "en" && (vertaling(p, "kop") || vertaling(p, "titel"));
+    return lines(en || p.kop || p.titel).replace(/\n\s*/g, "");
+  };
+  const opmerking = (o) => (o && L.opmerkingen[String(o).trim().toLowerCase()]) || o;
+
+  const formatDate = (iso) => {
+    const d = new Date(iso + "T12:00:00");
+    return isNaN(d) ? esc(iso) : L.datum(d.getDate(), L.maanden[d.getMonth()], d.getFullYear());
+  };
+  const formatPeriode = (a) => {
+    if (!a.dagen || a.tot === a.datum) return formatDate(a.datum);
+    const d = new Date(a.datum + "T12:00:00");
+    return L.datum(a.dagen.replace(/ en /g, L.en), L.maanden[d.getMonth()], d.getFullYear());
+  };
+
+  // ---------- vaste stukken (originele markup) ----------
+
+  const head = (title, bestand) => `<!DOCTYPE html>
+<!-- Oorspronkelijk ontwerp: Pieterjan Volckaert (Webflow) -->
+<html lang="${L.code}">
+<head>
+  <meta charset="utf-8">
+  <title>${esc(site.naam)}${title ? ` - ${esc(title)}` : ""}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="alternate" hreflang="nl" href="${SITE_URL}${paginaUrl("", bestand)}">
+  <link rel="alternate" hreflang="en" href="${SITE_URL}${paginaUrl("/en", bestand)}">
+  <link rel="stylesheet" type="text/css" href="/css/normalize.css">
+  <link rel="stylesheet" type="text/css" href="/css/webflow.css">
+  <link rel="stylesheet" type="text/css" href="/css/nikolaslestaeghenoimages.webflow.css">
+  <link rel="stylesheet" type="text/css" href="/css/aanvullingen.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js"></script>
+  <script>
+    if (window.WebFont) WebFont.load({
+      google: {
+        families: ["Montserrat:400,700"]
+      }
+    });
+  </script>
+  <script type="text/javascript" src="/js/modernizr.js"></script>
+  <link rel="shortcut icon" type="image/x-icon" href="https://daks2k3a4ib2z.cloudfront.net/placeholder/favicon.ico">
+</head>
+<body>`;
+
+  // Taalknop: verwijst naar dezelfde pagina in de andere taal
+  const taalLink = (bestand, cls) =>
+    `<a class="${cls} taalkeuze" href="${paginaUrl(TALEN[L.ander].pre, bestand)}" hreflang="${L.ander}" lang="${L.ander}" title="${L.anderNaam}">${L.anderLabel}</a>`;
+
+  const menu = (bestand) =>
+    `<div class="republiek-absoluut"><a class="menu-top" href="${P}/biografie.html">${esc(site.naam)}</a><a class="menu-top" href="${P}/projecten.html">${L.projecten}</a><a class="menu-top" href="${P}/agenda.html">${L.agenda}</a><a class="menu-top" href="#email-form">${L.contact}</a>${taalLink(bestand, "menu-top")}
       </div>`;
 
-const menuHomepagina = `<div class="republiek-absoluut"><a class="menu-top homepagina" href="/">${esc(site.naam)}</a><a class="menu-top homepagina" href="/projecten.html">Projecten</a><a class="menu-top homepagina" href="/agenda.html">Agenda</a><a class="menu-top homepagina" href="#email-form">Contact</a>
+  const menuHomepagina = (bestand) => `<div class="republiek-absoluut"><a class="menu-top homepagina" href="${P}/">${esc(site.naam)}</a><a class="menu-top homepagina" href="${P}/projecten.html">${L.projecten}</a><a class="menu-top homepagina" href="${P}/agenda.html">${L.agenda}</a><a class="menu-top homepagina" href="#email-form">${L.contact}</a>${taalLink(bestand, "menu-top homepagina")}
       </div>`;
 
-const footer = () => `  <div class="republiek-createdbalk">
+  const footer = () => `  <div class="republiek-createdbalk">
     <div class="w-container">
       <div class="w-row">
         <div class="w-col w-col-3">
-          <p>E-mail</p><a class="email" href="mailto:${esc(site.email)}" target="_blank">${esc(site.email).replace("@", " @")}</a>
-          ${site.telefoon ? `<p>Telefoon</p><a class="telefoon" href="tel:${esc(site.telefoon.replace(/[^\d+]/g, ""))}" target="_blank">${esc(site.telefoon)}</a>` : ""}
-          ${asArray(site.links).map((l) => `<a class="telefoon" href="${esc(l.link)}" target="_blank">${esc(l.titel)}</a>`).join("")}
+          <p>${L.email}</p><a class="email" href="mailto:${esc(site.email)}" target="_blank">${esc(site.email).replace("@", " @")}</a>
+          ${site.telefoon ? `<p>${L.telefoon}</p><a class="telefoon" href="tel:${esc(site.telefoon.replace(/[^\d+]/g, ""))}" target="_blank">${esc(site.telefoon)}</a>` : ""}
+          ${asArray(site.links).map((l) => `<a class="telefoon" href="${esc(l.link)}" target="_blank">${esc(tr(l, "titel"))}</a>`).join("")}
         </div>
         <div class="w-col w-col-7">
-          ${site.nieuwsbrief !== false && site.nieuwsbrief_url ? `<p>Abonneer je op Nikolas’ onregelmatige nieuwsbrief&nbsp;</p>
+          ${site.nieuwsbrief !== false && site.nieuwsbrief_url ? `<p>${L.nbTitel}&nbsp;</p>
           <div>
             <form class="form" id="email-form" method="POST" action="${esc(site.nieuwsbrief_url)}" onsubmit="return nieuwsbrief(this)">
               <input type="text" name="email_address_check" value="" tabindex="-1" autocomplete="off" style="display:none">
-              <input type="hidden" name="locale" value="nl">
-              <input class="w-input" id="email" type="email" placeholder="E-mailadres..." name="EMAIL" required="required">
-              <input class="w-button form-button" type="submit" value="Verstuur">
+              <input type="hidden" name="locale" value="${L.code}">
+              <input class="w-input" id="email" type="email" placeholder="${L.nbVeld}" name="EMAIL" required="required">
+              <input class="w-button form-button" type="submit" value="${L.nbKnop}">
             </form>
-            <div class="gelukt" style="display:none;padding:10px 15px;margin-bottom:19px"><p style="margin:0">Dank je wel! Bevestig je inschrijving via de mail die je zo dadelijk krijgt.</p></div>
+            <div class="gelukt" style="display:none;padding:10px 15px;margin-bottom:19px"><p style="margin:0">${L.nbDank}</p></div>
           </div>
           <script>
             function nieuwsbrief(f) {
@@ -264,25 +340,25 @@ const footer = () => `  <div class="republiek-createdbalk">
           </script>` : `<span id="email-form"></span>`}
         </div>
         <div class="w-col w-col-2">
-          <p>Webontwerp</p>${site.ontwerp_link ? `<a class="ontwerper" href="${esc(site.ontwerp_link)}" target="_blank">${esc(site.ontwerp)}</a>` : `<span class="ontwerper">${esc(site.ontwerp || "")}</span>`}
+          <p>${L.webontwerp}</p>${site.ontwerp_link ? `<a class="ontwerper" href="${esc(site.ontwerp_link)}" target="_blank">${esc(site.ontwerp)}</a>` : `<span class="ontwerper">${esc(site.ontwerp || "")}</span>`}
         </div>
       </div>
     </div>
   </div>`;
 
-const mediaKolom = (items) => {
-  const list = asArray(items);
-  if (!list.length) return `<div class="w-col w-col-2 w-col-stack"></div>`;
-  return `<div class="w-col w-col-2 w-col-stack">
+  const mediaKolom = (items) => {
+    const list = asArray(items);
+    if (!list.length) return `<div class="w-col w-col-2 w-col-stack"></div>`;
+    return `<div class="w-col w-col-2 w-col-stack">
             <div class="republiek-media">
-              <p class="hoofding-links">Media</p>${list.map((m) => m.afbeelding
-    ? `<a class="w-inline-block" href="${esc(m.link)}" target="_blank"><img class="logo" src="${esc(m.afbeelding)}" alt="${esc(m.titel)}"></a>`
-    : `<a class="menu-top media" href="${esc(m.link)}" target="_blank">${esc(m.titel)}</a>`).join("")}
+              <p class="hoofding-links">${L.media}</p>${list.map((m) => m.afbeelding
+      ? `<a class="w-inline-block" href="${esc(m.link)}" target="_blank"><img class="logo" src="${esc(m.afbeelding)}" alt="${esc(tr(m, "titel"))}"></a>`
+      : `<a class="menu-top media" href="${esc(m.link)}" target="_blank">${esc(tr(m, "titel"))}</a>`).join("")}
             </div>
           </div>`;
-};
+  };
 
-const tekstRij = (inner, media) => `      <div class="w-container">
+  const tekstRij = (inner, media) => `      <div class="w-container">
         <div class="w-row republiek-uitleg">
           <div class="w-col w-col-3 w-col-stack w-hidden-medium w-hidden-small w-hidden-tiny"></div>
           <div class="w-col w-col-7 w-col-stack">
@@ -292,7 +368,7 @@ const tekstRij = (inner, media) => `      <div class="w-container">
         </div>
       </div>`;
 
-const kleineRegel = (txt) => `      <div class="w-row republiek-uitleg">
+  const kleineRegel = (txt) => `      <div class="w-row republiek-uitleg">
         <div class="w-col w-col-3 w-col-stack w-hidden-medium w-hidden-small w-hidden-tiny"></div>
         <div class="w-col w-col-7 w-col-stack">
           <p class="republiek-createdbalk-fonts">${lines(txt)}</p>
@@ -300,109 +376,104 @@ const kleineRegel = (txt) => `      <div class="w-row republiek-uitleg">
         <div class="w-col w-col-2 w-col-stack w-hidden-medium w-hidden-small w-hidden-tiny"></div>
       </div>`;
 
-const kop = (p) => lines(p.kop || p.titel).replace(/\n\s*/g, "");
+  // ---------- speeldata weergeven ----------
 
-// ---------- speeldata weergeven ----------
+  const linkStijl = 'class="menu-top media" style="display:inline;padding:0;text-indent:0;font-size:inherit"';
+  const agendaTitel = (a) => (L.code === "en" && a.titel_en ? a.titel_en : a.titel);
 
-const linkStijl = 'class="menu-top media" style="display:inline;padding:0;text-indent:0;font-size:inherit"';
-
-// Eén regel op de agendapagina
-const agendaItem = (a) => {
-  const titel = a.slug ? `<a class="menu-top media" style="display:inline;padding:0;text-indent:0;font-size:inherit;color:inherit" href="/${a.slug}.html">${esc(a.titel)}</a>` : esc(a.titel);
-  const meta = [a.uur, a.locatie, a.opmerking].filter(Boolean).map(esc).join(" · ");
-  return `<div data-datum="${a.tot}">
+  // Eén regel op de agendapagina
+  const agendaItem = (a) => {
+    const titel = a.slug ? `<a class="menu-top media" style="display:inline;padding:0;text-indent:0;font-size:inherit;color:inherit" href="${P}/${a.slug}.html">${esc(agendaTitel(a))}</a>` : esc(agendaTitel(a));
+    const meta = [a.uur, a.locatie, opmerking(a.opmerking)].filter(Boolean).map(esc).join(" · ");
+    return `<div data-datum="${a.tot}">
               <p class="inleiding" style="margin-bottom:2px">${formatPeriode(a)} — ${titel}</p>
-              <p class="brood">${meta}${a.link ? `${meta ? " · " : ""}<a ${linkStijl} href="${esc(a.link)}" target="_blank">Info en tickets</a>` : ""}</p>
+              <p class="brood">${meta}${a.link ? `${meta ? " · " : ""}<a ${linkStijl} href="${esc(a.link)}" target="_blank">${L.infoTickets}</a>` : ""}</p>
             </div>`;
-};
+  };
 
-// Archief, gegroepeerd per jaar
-// Archief per jaar, elk jaar openklapbaar
-const jaarBlok = (j, inhoud, aantal) => `<details data-jaar="${j}" style="margin-top:12px">
+  // Archief per jaar, elk jaar openklapbaar
+  const jaarBlok = (j, inhoud) => `<details data-jaar="${j}" style="margin-top:12px">
                 <summary class="hoofding-links" style="display:list-item;cursor:pointer">${j}</summary>
                 <div data-items style="margin-top:8px">${inhoud}</div>
               </details>`;
-const perJaar = (items, render) => {
-  const groepen = [];
-  for (const a of items) {
-    const j = a.tot.slice(0, 4);
-    if (!groepen.length || groepen[groepen.length - 1].j !== j) groepen.push({ j, items: [] });
-    groepen[groepen.length - 1].items.push(a);
-  }
-  return groepen.map((g) => jaarBlok(g.j, g.items.map(render).join(""), g.items.length)).join("\n              ");
-};
+  const perJaar = (items, render) => {
+    const groepen = [];
+    for (const a of items) {
+      const j = a.tot.slice(0, 4);
+      if (!groepen.length || groepen[groepen.length - 1].j !== j) groepen.push({ j, items: [] });
+      groepen[groepen.length - 1].items.push(a);
+    }
+    return groepen.map((g) => jaarBlok(g.j, g.items.map(render).join(""))).join("\n              ");
+  };
 
-// Komende data per maand, elke maand openklapbaar (de eerste twee staan open)
-const MAANDEN_HOOFD = ["Januari", "Februari", "Maart", "April", "Mei", "Juni", "Juli", "Augustus", "September", "Oktober", "November", "December"];
-const perMaand = (items, render) => {
-  const groepen = [];
-  for (const a of items) {
-    const m = (a.datum < todayISO() ? a.tot : a.datum).slice(0, 7); // lopende reeks: onder de lopende maand
-    if (!groepen.length || groepen[groepen.length - 1].m !== m) groepen.push({ m, items: [] });
-    groepen[groepen.length - 1].items.push(a);
-  }
-  return groepen.map((g, i) => {
-    const [jaar, maand] = g.m.split("-");
-    return `<details data-maand="${g.m}"${i < 2 ? " open" : ""} style="margin-top:12px">
-                <summary class="hoofding-links" style="display:list-item;cursor:pointer">${MAANDEN_HOOFD[Number(maand) - 1]} ${jaar}</summary>
+  // Komende data per maand, elke maand openklapbaar (de eerste twee staan open)
+  const perMaand = (items, render) => {
+    const groepen = [];
+    for (const a of items) {
+      const m = (a.datum < todayISO() ? a.tot : a.datum).slice(0, 7); // lopende reeks: onder de lopende maand
+      if (!groepen.length || groepen[groepen.length - 1].m !== m) groepen.push({ m, items: [] });
+      groepen[groepen.length - 1].items.push(a);
+    }
+    return groepen.map((g, i) => {
+      const [jaar, maand] = g.m.split("-");
+      return `<details data-maand="${g.m}"${i < 2 ? " open" : ""} style="margin-top:12px">
+                <summary class="hoofding-links" style="display:list-item;cursor:pointer">${L.maandenHoofd[Number(maand) - 1]} ${jaar}</summary>
                 <div data-items style="margin-top:8px">${g.items.map(render).join("")}</div>
               </details>`;
-  }).join("\n              ");
-};
+    }).join("\n              ");
+  };
 
-function agendaInhoud() {
-  return `<div data-komend="archief-agenda">
-              <p class="brood" data-leeg${upcoming.length ? ' style="display:none"' : ""}>Binnenkort nieuwe data. Abonneer je op de nieuwsbrief om niets te missen.</p>
+  const agendaInhoud = () => `<div data-komend="archief-agenda">
+              <p class="brood" data-leeg${upcoming.length ? ' style="display:none"' : ""}>${L.agendaLeeg}</p>
               ${perMaand(upcoming, agendaItem)}
             </div>
             <div data-archief${past.length ? "" : ' style="display:none"'}>
-              <p class="credits-head" style="margin-top:35px">Archief</p>
+              <p class="credits-head" style="margin-top:35px">${L.archief}</p>
               <div id="archief-agenda">${perJaar(past, agendaItem)}</div>
             </div>`;
-}
 
-// Speeldata onderaan een projectpagina
-const projectRegel = (a) => {
-  const meta = [a.uur, a.locatie, a.opmerking].filter(Boolean).map(esc).join(" · ");
-  return `<p class="credits" data-datum="${a.tot}" style="margin-bottom:6px">${formatPeriode(a)}${meta ? ` · ${meta}` : ""}${a.link ? ` · <a ${linkStijl} href="${esc(a.link)}" target="_blank">tickets</a>` : ""}</p>`;
-};
-function speeldataProject(p) {
-  const eigen = agenda.filter((a) => a.titel === p.titel || a.slug === p.slug);
-  if (!eigen.length) return "";
-  const komend = eigen.filter((a) => a.tot >= todayISO());
-  const voorbij = eigen.filter((a) => a.tot < todayISO()).reverse();
-  const id = `archief-${p.slug}`;
-  return `<div data-komend="${id}">
-              <p class="credits-head" style="margin-top:25px">Speeldata</p>
-              <p class="credits" data-leeg${komend.length ? ' style="display:none"' : ""}>Momenteel geen geplande voorstellingen.</p>
+  // Speeldata onderaan een projectpagina
+  const projectRegel = (a) => {
+    const meta = [a.uur, a.locatie, opmerking(a.opmerking)].filter(Boolean).map(esc).join(" · ");
+    return `<p class="credits" data-datum="${a.tot}" style="margin-bottom:6px">${formatPeriode(a)}${meta ? ` · ${meta}` : ""}${a.link ? ` · <a ${linkStijl} href="${esc(a.link)}" target="_blank">${L.tickets}</a>` : ""}</p>`;
+  };
+  const speeldataProject = (p) => {
+    const eigen = agenda.filter((a) => a.titel === p.titel || a.slug === p.slug);
+    if (!eigen.length) return "";
+    const komend = eigen.filter((a) => a.tot >= todayISO());
+    const voorbij = eigen.filter((a) => a.tot < todayISO()).reverse();
+    const id = `archief-${p.slug}`;
+    return `<div data-komend="${id}">
+              <p class="credits-head" style="margin-top:25px">${L.speeldata}</p>
+              <p class="credits" data-leeg${komend.length ? ' style="display:none"' : ""}>${L.geenGepland}</p>
               ${komend.map(projectRegel).join("\n              ")}
             </div>
             <details data-archief${voorbij.length ? "" : ' style="display:none"'} style="margin-bottom:15px">
-              <summary class="credits-head" style="cursor:pointer;margin-top:15px">Eerder gespeeld (<span data-teller="${id}">${voorbij.length}</span>)</summary>
+              <summary class="credits-head" style="cursor:pointer;margin-top:15px">${L.eerderGespeeld} (<span data-teller="${id}">${voorbij.length}</span>)</summary>
               <div id="${id}">${voorbij.map(projectRegel).join("")}</div>
             </details>`;
-}
+  };
 
-// ---------- pagina's ----------
+  // ---------- pagina's ----------
 
-const pages = {};
+  const pages = {};
 
-// Home: één grote foto met het menu
-const homeFoto = site.achtergrond_home && site.achtergrond_home !== HOME_ORIGINEEL ? ` style="background-image:${esc(cssUrl(site.achtergrond_home))}"` : "";
-pages["index.html"] = `${head("Home")}
+  // Home: één grote foto met het menu
+  const homeFoto = site.achtergrond_home && site.achtergrond_home !== HOME_ORIGINEEL ? ` style="background-image:${esc(cssUrl(site.achtergrond_home))}"` : "";
+  pages["index.html"] = `${head(L.home, "index.html")}
   <div class="projecten-achtergrond"${homeFoto}>
     <div class="w-container">
-      <div class="republiek-absoluut home"><a class="menu-top" href="/biografie.html">${esc(site.naam)}</a><a class="menu-top" href="/projecten.html">Projecten</a><a class="menu-top" href="/agenda.html">Agenda</a>
+      <div class="republiek-absoluut home"><a class="menu-top" href="${P}/biografie.html">${esc(site.naam)}</a><a class="menu-top" href="${P}/projecten.html">${L.projecten}</a><a class="menu-top" href="${P}/agenda.html">${L.agenda}</a>${taalLink("index.html", "menu-top")}
       </div>
     </div>
   </div>
 ${scripts}`;
 
-// Projectenoverzicht
-pages["projecten.html"] = `${head("Projecten")}
+  // Projectenoverzicht
+  pages["projecten.html"] = `${head(L.projecten, "projecten.html")}
   <div>
     <div class="w-container">
-      ${menu()}
+      ${menu("projecten.html")}
     </div>
 ${projects.map((p) => {
   const o = ORIGINEEL[p.slug] || {};
@@ -412,7 +483,7 @@ ${projects.map((p) => {
         <div class="w-col w-col-3 w-hidden-small w-hidden-tiny"></div>
         <div class="w-col w-col-7">
           <div class="projecten-div-blauw">
-            <a ${fotoAttr("w-inline-block projecten-linkfoto", o.tegel, tegel, "background-size:cover;background-position:50% 50%;")} href="/${p.slug}.html">
+            <a ${fotoAttr("w-inline-block projecten-linkfoto", o.tegel, tegel, "background-size:cover;background-position:50% 50%;")} href="${P}/${p.slug}.html">
               <div>${kop(p)}${p.jaar ? `<br>${esc(p.jaar)}` : ""}</div>
             </a>
           </div>
@@ -425,35 +496,36 @@ ${projects.map((p) => {
 ${footer()}
 ${scripts}`;
 
-// Projectpagina's
-projects.forEach((p, i) => {
-  const o = ORIGINEEL[p.slug] || {};
-  const n = projects.length;
-  const ouder = projects[(i + 1) % n]; // links
-  const nieuwer = projects[(i - 1 + n) % n]; // rechts
-  const fotos = asArray(p.fotos);
-  const embed = videoEmbed(p.video);
-  const videoBestand = p.video_bestand && !teGroot.has(p.video_bestand) ? p.video_bestand : "";
-  const top = p.cover || fotos[0];
-  const achter = p.achterfoto || fotos[1] || top;
+  // Projectpagina's
+  projects.forEach((p, i) => {
+    const o = ORIGINEEL[p.slug] || {};
+    const n = projects.length;
+    const ouder = projects[(i + 1) % n]; // links
+    const nieuwer = projects[(i - 1 + n) % n]; // rechts
+    const fotos = asArray(p.fotos);
+    const embed = videoEmbed(p.video);
+    const videoBestand = p.video_bestand && !teGroot.has(p.video_bestand) ? p.video_bestand : "";
+    const top = p.cover || fotos[0];
+    const achter = p.achterfoto || fotos[1] || top;
+    const bestand = `${p.slug}.html`;
 
-  const tekst = [
-    p.intro ? paragraphs(p.intro, "inleiding") : "",
-    rich(p.tekst),
-    p.citaat ? `<p class="citaat">${lines(p.citaat)}</p>` : "",
-    p.credits ? `<p class="credits-head">Credits</p>\n            <p class="credits">${lines(p.credits)}</p>` : "",
-    speeldataProject(p),
-  ].filter(Boolean).join("\n            ");
+    const tekst = [
+      tr(p, "intro") ? paragraphs(tr(p, "intro"), "inleiding") : "",
+      rich(tr(p, "tekst")),
+      tr(p, "citaat") ? `<p class="citaat">${lines(tr(p, "citaat"))}</p>` : "",
+      tr(p, "credits") ? `<p class="credits-head">${L.credits}</p>\n            <p class="credits">${lines(tr(p, "credits"))}</p>` : "",
+      speeldataProject(p),
+    ].filter(Boolean).join("\n            ");
 
-  pages[`${p.slug}.html`] = `${head(p.titel)}
+    pages[bestand] = `${head(titelVan(p), bestand)}
   <div ${fotoAttr("republiek-topfoto", o.top, top, "background-size:cover;background-position:50% 50%;background-attachment:fixed;")}>
     <div class="w-container">
-      ${menu()}
+      ${menu(bestand)}
     </div>
     <div class="w-container">
       <div class="w-row republiek-fototekst">
         <div class="w-col w-col-3 w-col-stack w-hidden-small w-hidden-tiny">
-          ${n > 1 ? `<div class="projecten-link-div projecten-link-div-links"><a class="projecten-link" href="/${ouder.slug}.html">${esc(ouder.titel)}</a>
+          ${n > 1 ? `<div class="projecten-link-div projecten-link-div-links"><a class="projecten-link" href="${P}/${ouder.slug}.html">${esc(titelVan(ouder))}</a>
             <div class="w-icon-slider-left fotopijltje links-pijltje"></div>
           </div>` : ""}
         </div>
@@ -462,7 +534,7 @@ projects.forEach((p, i) => {
         </div>
         <div class="w-col w-col-2 w-col-stack w-hidden-small w-hidden-tiny">
           ${n > 1 ? `<div class="projecten-link-div">
-            <div class="w-icon-slider-right fotopijltje"></div><a class="projecten-link" href="/${nieuwer.slug}.html">${esc(nieuwer.titel)}</a>
+            <div class="w-icon-slider-right fotopijltje"></div><a class="projecten-link" href="${P}/${nieuwer.slug}.html">${esc(titelVan(nieuwer))}</a>
           </div>` : ""}
         </div>
       </div>
@@ -478,8 +550,7 @@ ${tekstRij(tekst, p.media)}
       <div class="w-row">
         <div class="w-col w-col-3 w-hidden-small w-hidden-tiny"></div>
         <div class="w-col w-col-7">
-          <p class="foto-op-tekst">IN
-            <br>BEELD</p>
+          <p class="foto-op-tekst">${L.inBeeld}</p>
         </div>
         <div class="w-col w-col-2 w-hidden-small w-hidden-tiny"></div>
       </div>
@@ -504,7 +575,7 @@ ${videoBestand ? `      <div class="w-row republiek-uitleg">
 ${fotos.length ? `      <div class="w-slider republiek-slider" data-animation="slide" data-duration="500" data-infinite="1">
         <div class="w-slider-mask">
 ${fotos.map((f) => `          <div class="w-slide">
-            <img class="republiek-slider-foto-eig" src="${esc(f)}" alt="${esc(p.titel)}">
+            <img class="republiek-slider-foto-eig" src="${esc(f)}" alt="${esc(titelVan(p))}">
           </div>`).join("\n")}
         </div>
         <div class="w-slider-arrow-left links">
@@ -515,44 +586,44 @@ ${fotos.map((f) => `          <div class="w-slide">
         </div>
         <div class="w-slider-nav w-round"></div>
       </div>` : ""}
-${!fotos.length && !embed && !videoBestand ? kleineRegel("Binnenkort meer foto’s") : ""}
-${p.fotocredits ? kleineRegel(p.fotocredits) : ""}
+${!fotos.length && !embed && !videoBestand ? kleineRegel(L.meerFotos) : ""}
+${tr(p, "fotocredits") ? kleineRegel(tr(p, "fotocredits")) : ""}
     </div>
 ${footer()}
   </div>
 ${scripts}`;
-});
+  });
 
-// Biografie
-const bioFoto = bio.portret && bio.portret !== BIO_ORIGINEEL ? ` style="background-image:${esc(cssUrl(bio.portret))};background-size:cover;background-position:50% 50%;background-attachment:fixed;"` : "";
-const bioKlasse = bio.portret && bio.portret !== BIO_ORIGINEEL ? "republiek-topfoto" : "republiek-topfoto foto-nikolas";
-pages["biografie.html"] = `${head("Biografie")}
+  // Biografie
+  const bioFoto = bio.portret && bio.portret !== BIO_ORIGINEEL ? ` style="background-image:${esc(cssUrl(bio.portret))};background-size:cover;background-position:50% 50%;background-attachment:fixed;"` : "";
+  const bioKlasse = bio.portret && bio.portret !== BIO_ORIGINEEL ? "republiek-topfoto" : "republiek-topfoto foto-nikolas";
+  pages["biografie.html"] = `${head(L.biografie, "biografie.html")}
   <div class="${bioKlasse}"${bioFoto}>
     <div class="w-container">
-      ${menuHomepagina}
+      ${menuHomepagina("biografie.html")}
       <div class="w-row republiek-fototekst">
         <div class="w-col w-col-3 w-hidden-small w-hidden-tiny"></div>
         <div class="w-col w-col-7">
-          <p class="foto-op-tekst">${lines(bio.kop || site.naam).replace(/\n\s*/g, "")}</p>
+          <p class="foto-op-tekst">${lines(tr(bio, "kop") || site.naam).replace(/\n\s*/g, "")}</p>
         </div>
         <div class="w-col w-col-2 w-hidden-small w-hidden-tiny"></div>
       </div>
     </div>
   </div>
   <div>
-${tekstRij([bio.intro ? paragraphs(bio.intro, "inleiding") : "", rich(bio.tekst)].filter(Boolean).join("\n            "), bio.media)}
+${tekstRij([tr(bio, "intro") ? paragraphs(tr(bio, "intro"), "inleiding") : "", rich(tr(bio, "tekst"))].filter(Boolean).join("\n            "), bio.media)}
   </div>
 ${footer()}
 ${scripts}`;
 
-pages["agenda.html"] = `${head("Agenda")}
+  pages["agenda.html"] = `${head(L.agenda, "agenda.html")}
   <div class="republiek-topfoto foto-nikolas">
     <div class="w-container">
-      ${menuHomepagina}
+      ${menuHomepagina("agenda.html")}
       <div class="w-row republiek-fototekst">
         <div class="w-col w-col-3 w-hidden-small w-hidden-tiny"></div>
         <div class="w-col w-col-7">
-          <p class="foto-op-tekst">Agenda</p>
+          <p class="foto-op-tekst">${L.agenda}</p>
         </div>
         <div class="w-col w-col-2 w-hidden-small w-hidden-tiny"></div>
       </div>
@@ -564,11 +635,11 @@ ${tekstRij(agendaInhoud(), [])}
 ${footer()}
 ${scripts}`;
 
-// Bedankt en 404
-const eenvoudig = (titel, html) => `${head(titel)}
+  // Bedankt en 404
+  const eenvoudig = (titel, html, bestand) => `${head(titel, bestand)}
   <div class="republiek-topfoto foto-nikolas">
     <div class="w-container">
-      ${menuHomepagina}
+      ${menuHomepagina(bestand)}
       <div class="w-row republiek-fototekst">
         <div class="w-col w-col-3 w-hidden-small w-hidden-tiny"></div>
         <div class="w-col w-col-7"><p class="foto-op-tekst">${esc(titel)}</p></div>
@@ -581,8 +652,14 @@ ${tekstRij(html, [])}
   </div>
 ${footer()}
 ${scripts}`;
-pages["bedankt.html"] = eenvoudig("Dank je wel!", `<p class="brood">We hebben je adres ontvangen. <a href="/" style="color:#4778ff">Terug naar de voorpagina</a>.</p>`);
-pages["404.html"] = eenvoudig("Oeps", `<p class="brood">Deze pagina bestaat niet (meer). Bekijk de <a href="/projecten.html" style="color:#4778ff">projecten</a>.</p>`);
+  pages["bedankt.html"] = eenvoudig(L.bedanktTitel, `<p class="brood">${L.bedanktTekst(P)}</p>`, "bedankt.html");
+  pages["404.html"] = eenvoudig(L.nietGevondenTitel, `<p class="brood">${L.nietGevondenTekst(P)}</p>`, "404.html");
+
+  return pages;
+}
+
+// Adres van een pagina in een taal ("" = Nederlands, "/en" = Engels)
+const paginaUrl = (pre, bestand) => `${pre}/${bestand === "index.html" ? "" : bestand}`;
 
 // ---------- wegschrijven ----------
 
@@ -593,12 +670,17 @@ fs.cpSync(STATIC, OUT, {
   filter: (src) => !teGroot.has("/" + path.relative(STATIC, src).split(path.sep).join("/")),
 });
 teGroot.forEach((f) => waarschuwingen.push(`${f} is groter dan 25 MB (${mb(fs.statSync(path.join(STATIC, f)).size)} MB) en wordt niet gepubliceerd. Maak het bestand kleiner of gebruik een YouTube- of Vimeo-link.`));
-for (const [file, html] of Object.entries(pages)) fs.writeFileSync(path.join(OUT, file), html);
+let aantalPaginas = 0;
+for (const L of Object.values(TALEN)) {
+  const map = path.join(OUT, L.pre);
+  fs.mkdirSync(map, { recursive: true });
+  for (const [file, html] of Object.entries(bouwTaal(L))) { fs.writeFileSync(path.join(map, file), html); aantalPaginas++; }
+}
 
 const missing = new Set();
 const check = (src) => { if (src && src.startsWith("/") && !fs.existsSync(path.join(OUT, src))) missing.add(src); };
 projects.forEach((p) => [p.cover, p.achterfoto, p.tegelfoto, ...asArray(p.fotos)].forEach(check));
 check(bio.portret);
-console.log(`Klaar: ${Object.keys(pages).length} pagina's, ${projects.length} projecten, ${agenda.length} speeldata (${upcoming.length} komend).`);
+console.log(`Klaar: ${aantalPaginas} pagina's (NL + EN), ${projects.length} projecten, ${agenda.length} speeldata (${upcoming.length} komend).`);
 waarschuwingen.forEach((w) => console.log("Let op: " + w));
 if (missing.size) console.log(`Let op, ontbrekende foto's: ${[...missing].join(", ")}`);

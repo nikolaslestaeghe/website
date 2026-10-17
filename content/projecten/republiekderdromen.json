@@ -34,5 +34,14 @@
     "/images/13.jpg",
     "/images/14.jpg"
   ],
-  "fotocredits": "Foto's: Nikolas Lestaeghe, Pieterjan Volckaert, Dorien Van Vooren"
+  "fotocredits": "Foto's: Nikolas Lestaeghe, Pieterjan Volckaert, Dorien Van Vooren",
+  "en": {
+    "titel": "Republic of Dreams",
+    "kop": "Republic\nof dreams",
+    "intro": "‘We decided to become independent, to create a new principle of life, to begin a new era, to constitute the world once more – on a small scale, admittedly, just for ourselves, but in accordance with our taste and our wishes.’ (Bruno Schulz)",
+    "tekst": "<p>‘Republic of Dreams’ is a performance Nikolas made together with Anjana Dierckx. It is about dealing with absence, or wanting to be somewhere other than where you are.</p>",
+    "citaat": "“Because in the Republic of Dreams anything is possible. And that appeals to us. The ellipse this performance creates is one of rare beauty. With simple elements and endless creativity, the image of a fantasy world au dehors is built up. A childlike quality combined with the bitter aftertaste of reality.\nA performance that makes you dream, but that also addresses escapism and wraps it in a very pure, perhaps slightly too long, elliptical elegance. But in the republic that is allowed. In the Republic of Dreams you may keep repeating yourself. Undoubtedly the crowning glory of the MAYDAY festival.\n‘If you put that crown on my head, would you also bow?’ I bow.”\n(E.C., redactie-mayday2012.blogspot.be)",
+    "credits": "Concept and direction: Nikolas Lestaeghe\nPerformers: Anjana Dierckx and Nikolas Lestaeghe\nTechnics: Joris Loveniers\nCoaching: Johan D'Hollander and Geert Opsomer",
+    "fotocredits": "Photos: Nikolas Lestaeghe, Pieterjan Volckaert, Dorien Van Vooren"
+  }
 }

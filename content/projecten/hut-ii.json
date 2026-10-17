@@ -14,7 +14,8 @@
   "media": [
     {
       "titel": "4hoog speellijst",
-      "link": "http://www.4hoog.be/nl/production/57/hut"
+      "link": "http://www.4hoog.be/nl/production/57/hut",
+      "titel_en": "4hoog tour dates"
     }
   ],
   "video": "",
@@ -26,5 +27,10 @@
     "/images/hut5.jpg",
     "/images/hut6.jpg"
   ],
-  "fotocredits": "Foto's: Caroline Vincart"
+  "fotocredits": "Foto's: Caroline Vincart",
+  "en": {
+    "tekst": "<p>Little Sister takes you to Big Brother. Big Brother can do anything. Live in a hut. Talk to rabbits. Make birds whistle. Little Sister loves being there. Picking apples together. Scraping carrots and sleeping in one pair of pyjamas. Along an imaginary forest path, Little Sister (Ilse De Koe) takes you into the woods. A wonderful set houses the hut where Big Brother (Nikolas Lestaeghe) lives.</p>\n<p>Nikolas Lestaeghe adapted HUT (I) into a performance for children. He did so for ‘D-Buut’, a platform of 4hoog that gives young theatre makers the chance to experiment with children’s theatre.</p>",
+    "credits": "Concept and direction: Nikolas Lestaeghe and Frans Van der Aa\nPerformers: Nikolas Lestaeghe and Ilse De Koe\nSet: Nikolas Lestaeghe, Sarah Geirnaert and Lucas Verbrugge",
+    "fotocredits": "Photos: Caroline Vincart"
+  }
 }

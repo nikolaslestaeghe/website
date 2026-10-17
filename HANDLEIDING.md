@@ -54,6 +54,15 @@ Wat de site daarmee doet:
 
 Iets dat niet bij een project hoort (een lezing, een workshop)? Gebruik **Losse agendapunten**.
 
+## Engelse versie
+
+De site bestaat in het Nederlands (gewone adressen) en in het Engels (onder `/en/`). Bezoekers wisselen met **EN / NL** onder het menu.
+
+- Elk project en de biografie hebben onderaan het blok **English version**. Vul daar de Engelse titel, inleiding, tekst, citaat, credits en fotocredits in.
+- Laat je een Engels veld leeg, dan toont de Engelse site gewoon de Nederlandse tekst. Je hoeft dus niet alles meteen te vertalen.
+- Datums, plaatsen, foto's, video's en speellijsten vul je maar één keer in; die verschijnen in beide talen. Veelvoorkomende opmerkingen in speellijsten (schoolvoorstelling, première, uitverkocht, geannuleerd) worden automatisch vertaald.
+- Bij links in de rechterkolom en losse agendapunten kan je optioneel een Engelse tekst invullen.
+
 ## Biografie en contactgegevens
 
 Bij **Biografie** en **Algemene gegevens** in de beheerpagina.

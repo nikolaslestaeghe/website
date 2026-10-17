@@ -24,5 +24,12 @@
     "/images/08.jpg",
     "/images/09.jpg"
   ],
-  "fotocredits": "Foto's: TAZ, Tom Callemin, Pieterjan Volckaert en Nikolas Lestaeghe"
+  "fotocredits": "Foto's: TAZ, Tom Callemin, Pieterjan Volckaert en Nikolas Lestaeghe",
+  "en": {
+    "intro": "A man with a cool box and a passion for everything to do with flying: he designs, tinkers, spreads his wings, burns his fingers. He opens the door to his imagination, the open sky.",
+    "tekst": "<p>With ‘Manita’, Nikolas Lestaeghe presents a touchingly beautiful, intimate solo about dealing with loss, about the gravity that sometimes pulls at you, and about your imagination in full flight.</p>",
+    "citaat": "“With ‘Manita’, Lestaeghe offers a simple but endearing tribute to his pet.” (Knack)\n\n“So simple, so pure, so childlike and true.” (theatermaggezien.net)",
+    "credits": "Concept, direction, performance, technics: Nikolas Lestaeghe",
+    "fotocredits": "Photos: TAZ, Tom Callemin, Pieterjan Volckaert and Nikolas Lestaeghe"
+  }
 }

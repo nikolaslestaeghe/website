@@ -23,5 +23,11 @@
   ],
   "video": "https://www.youtube.com/watch?v=HV_yHweGFak",
   "fotos": [],
-  "fotocredits": "Foto's: Nikolas Lestaeghe, Pieterjan Volckaert, Dorien Van Vooren"
+  "fotocredits": "Foto's: Nikolas Lestaeghe, Pieterjan Volckaert, Dorien Van Vooren",
+  "en": {
+    "intro": "Without meaning to, a boy\nhas become a grown-up.",
+    "tekst": "<p>He now has a grown-up life<br>in a grown-up house<br>far away from his little-boy home.<br>Today he rebuilds his tree house,<br>and for a moment the grown-up<br>relives his little hut story.</p>",
+    "credits": "Concept and direction: Nikolas Lestaeghe",
+    "fotocredits": "Photos: Nikolas Lestaeghe, Pieterjan Volckaert, Dorien Van Vooren"
+  }
 }

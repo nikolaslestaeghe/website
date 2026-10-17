@@ -30,5 +30,12 @@
     "/images/09_1.jpg",
     "/images/10_1.jpg"
   ],
-  "fotocredits": "Foto's: Marc Vandermeulen · Filmstills: Nikolas Lestaeghe"
+  "fotocredits": "Foto's: Marc Vandermeulen · Filmstills: Nikolas Lestaeghe",
+  "en": {
+    "titel": "Salute #2",
+    "kop": "Salute #2",
+    "tekst": "<p>A wobbly brass band, a plastic trumpet and a cheap coffee maker. With limited means, Nikolas Lestaeghe gives new meaning to customs and traditions.<br>He tells a story without speaking. With cardboard actors he presents, in a visual and personal way, a solo about dealing with loss, traditions and roots.</p>\n<p>With thanks to: Rits, Harry Cole and De Maan, puppet theatre</p>",
+    "credits": "Concept/performance: Nikolas Lestaeghe\nTechnics/lighting design: Marcel Van Damme",
+    "fotocredits": "Photos: Marc Vandermeulen · Film stills: Nikolas Lestaeghe"
+  }
 }

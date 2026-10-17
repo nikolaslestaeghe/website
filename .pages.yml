@@ -144,6 +144,9 @@ content:
           - name: titel
             label: Tekst van de link
             type: string
+          - name: titel_en
+            label: Tekst van de link in het Engels (optioneel)
+            type: string
           - name: link
             label: Adres (https://...)
             type: string
@@ -152,6 +155,35 @@ content:
             type: image
             options:
               media: images
+      - name: en
+        label: English version (Engelse versie)
+        description: "Laat een veld leeg om op de Engelse site de Nederlandse tekst te tonen."
+        type: object
+        fields:
+          - name: titel
+            label: Title
+            type: string
+            description: "Leeg = dezelfde titel als in het Nederlands."
+          - name: kop
+            label: Title on the photo (optioneel)
+            type: text
+          - name: intro
+            label: Introduction (blauw gedrukt)
+            type: text
+          - name: tekst
+            label: Text
+            type: rich-text
+            options:
+              format: html
+          - name: citaat
+            label: Quote or review
+            type: text
+          - name: credits
+            label: Credits
+            type: text
+          - name: fotocredits
+            label: Photo credits
+            type: string
       - name: volgorde
         label: Volgorde binnen hetzelfde jaar (optioneel)
         type: number
@@ -178,6 +210,9 @@ content:
         label: Titel
         type: string
         required: true
+      - name: titel_en
+        label: Titel in het Engels (optioneel)
+        type: string
       - name: uur
         label: Uur (optioneel)
         type: string
@@ -221,6 +256,22 @@ content:
         type: rich-text
         options:
           format: html
+      - name: en
+        label: English version (Engelse versie)
+        description: "Laat een veld leeg om op de Engelse site de Nederlandse tekst te tonen."
+        type: object
+        fields:
+          - name: kop
+            label: Title on the photo
+            type: text
+          - name: intro
+            label: Introduction (blauw gedrukt)
+            type: text
+          - name: tekst
+            label: Text
+            type: rich-text
+            options:
+              format: html
       - name: media
         label: Links (rechterkolom)
         type: object
@@ -228,6 +279,9 @@ content:
         fields:
           - name: titel
             label: Tekst van de link
+            type: string
+          - name: titel_en
+            label: Tekst van de link in het Engels (optioneel)
             type: string
           - name: link
             label: Adres

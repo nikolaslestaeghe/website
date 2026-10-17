@@ -45,5 +45,14 @@
     "/images/Loopgravenoperette39.jpg",
     "/images/Loopgravenoperette40.jpg"
   ],
-  "fotocredits": "Foto's: Tom Callemin"
+  "fotocredits": "Foto's: Tom Callemin",
+  "en": {
+    "titel": "Trench Operetta",
+    "kop": "Trench\noperetta",
+    "intro": "In The Trench Operetta, Nikolas Lestaeghe tries to find answers to the questions his family cannot talk about. Following The Halfmoon Files, he interviewed his own family as an anthropological study of himself.",
+    "tekst": "<p>Nikolas draws on failed interviews with his grandfather about his origins, family name and history, on Viennese and German operettas, and on his own need to be meaningful. The result is a wry, bitter operetta in which he takes three other performers along. He starts from their own small histories, full of unspeakable taboos, and ends up in the grandeur of a trench war. The premiere took place on 9 May 2015 at Theater Malpertuis.</p>\n<p>With the support of Pianofabriek Kunstenwerkplaats, the Flemish Community Commission, KASK and GoneWest, the cultural commemoration of WWI by the Province of West Flanders, of which this project is a part.</p>",
+    "citaat": "We dance the trench dance\nWe sing the song of heroism\nWe are troubled by life’s uncertainties\nWe have a fit\nWe hold each other up\nWe search for a meaningful origin\n\nAnd all together we sing:\n“This is the trench operetta\nin which the Germans occupied Belgium\nbut it doesn’t end there\nso much is still not right\nso much not right\nso much not right”",
+    "credits": "Concept and direction: Nikolas Lestaeghe\nPerformance and singing: Linde Carrijn, Anjana Dierckx, Nikolas Lestaeghe, Marlies Tack\nVocal coaching: Rik Debonne",
+    "fotocredits": "Photos: Tom Callemin"
+  }
 }

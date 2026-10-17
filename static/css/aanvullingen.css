@@ -5,3 +5,10 @@
   object-fit: contain;
   width: 100%;
 }
+
+/* Taalkeuze (NL / EN) onder het menu */
+.menu-top.taalkeuze {
+  margin-top: 10px;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+}
