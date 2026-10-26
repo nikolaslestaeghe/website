@@ -2,9 +2,12 @@
   "titel": "Allez Lea",
   "kop": "Allez Lea",
   "jaar": "2023",
-  "zichtbaar": false,
+  "zichtbaar": true,
   "soort": "samenwerking",
-  "met": "spel & decor · Ilse De Koe",
+  "met": "spel & decor · Ilse De Koe - Another Hero",
+  "cover": "/images/©KrisBlomme2 Large.jpeg",
+  "achterfoto": "/images/IMG_9063 Large.jpeg",
+  "tegelfoto": "/images/IMG_9036 Large.jpeg",
   "intro": "ALLEZ LEA is een theatervoorstelling met Ilse de Koe en Nikolas Lestaeghe. Het is een West-Vlaamse familievoorstelling voor jong en ouder!",
   "tekst": "<p>Vandaag laat gids Rudi je kennismaken met de legende van het lichtmeisje Lea. Ze verlaat nooit haar plek. Ze is zoals zovelen onvervangbaar. Maar de wereld begint ook bij Lea door te dringen. <strong>Hoelang kun je op één plek blijven?</strong> <strong>En hoe weet je wanneer je weer verder moet?</strong> Wat als je in je eigen wereld bent vastgegroeid? Is het dan te laat?</p>",
   "credits": "Concept: Ilse de Koe\nSpel en tekst: Ilse de Koe en Nikolas Lestaeghe\nDecor: Nikolas Lestaeghe\nTechniek: Marec Zeghers\nProductie: Another Hero\nKostuums: Elles de Koe\nCoach: Tom Ternest\nCoproductie: Uitwijken, Brugge Plus, Cc De Spil Roeselare",
@@ -21,10 +24,10 @@
   ],
   "fotocredits": "Jens Vanden Abeele",
   "en": {
-    "tekst": "<p>Today, guide Rudi introduces you to the legend of Lea, the girl of light. She never leaves her spot. Like so many others, she is irreplaceable. But the world is starting to get through to Lea too. <strong>How long can you stay in one place?</strong> <strong>And how do you know when it is time to move on?</strong> What if you have grown stuck in your own world? Is it too late then?</p>",
-    "met": "performance & set · Ilse De Koe",
     "intro": "ALLEZ LEA is a theatre performance with Ilse de Koe and Nikolas Lestaeghe. It is a West Flemish family show for young and old!",
+    "tekst": "<p>Today, guide Rudi introduces you to the legend of Lea, the girl of light. She never leaves her spot. Like so many others, she is irreplaceable. But the world is starting to get through to Lea too. <strong>How long can you stay in one place?</strong> <strong>And how do you know when it is time to move on?</strong> What if you have grown stuck in your own world? Is it too late then?</p>",
     "credits": "Concept: Ilse de Koe\nPerformance and text: Ilse de Koe and Nikolas Lestaeghe\nSet: Nikolas Lestaeghe\nTechnics: Marec Zeghers\nProduction: Another Hero\nCostumes: Elles de Koe\nCoach: Tom Ternest\nCo-production: Uitwijken, Brugge Plus, CC De Spil Roeselare",
-    "fotocredits": "Photos: Jens Vanden Abeele"
+    "fotocredits": "Photos: Jens Vanden Abeele",
+    "met": "performance & set · Ilse De Koe"
   }
 }
