@@ -1,22 +1,10 @@
 {
-  "titel": "Alles Lea",
-  "kop": "Alles Lea",
-  "jaar": "",
+  "titel": "Allez Lea",
+  "kop": "Allez Lea",
+  "jaar": "2023",
   "zichtbaar": false,
-  "soort": "samenwerking",
-  "met": "spel & decor · Ilse De Koe",
-  "cover": "",
-  "achterfoto": "",
-  "tegelfoto": "",
-  "intro": "",
-  "tekst": "",
-  "citaat": "",
-  "credits": "",
-  "media": [],
-  "video": "",
-  "fotos": [],
-  "fotocredits": "",
+  "tekst": "<p></p>",
   "en": {
-    "met": "performance & set · Ilse De Koe"
+    "tekst": "<p></p>"
   }
 }
