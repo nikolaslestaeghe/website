@@ -2,15 +2,15 @@
   "titel": "HUT (I)",
   "kop": "HUT (I)",
   "jaar": "2011",
-  "volgorde": 1,
-  "zichtbaar": true,
+  "zichtbaar": false,
   "cover": "/images/01_4.jpg",
   "achterfoto": "/images/04_4.jpg",
   "tegelfoto": "/images/04 kopie.jpg",
   "intro": "Zonder het te willen is een jongen\neen grote mens geworden.",
   "tekst": "<p>Hij heeft nu een grote-mensen-leven<br>in een grote-mensen-huis<br>ver weg van zijn kleine-jongens-thuis.<br>Vandaag bouwt hij zijn boomhut opnieuw,<br>en voor even beleeft de grote mens<br>opnieuw zijn kleine hutverhaal.</p>",
-  "citaat": "",
   "credits": "Concept en regie: Nikolas Lestaeghe",
+  "video": "https://www.youtube.com/watch?v=HV_yHweGFak",
+  "fotocredits": "Foto's: Nikolas Lestaeghe, Pieterjan Volckaert, Dorien Van Vooren",
   "media": [
     {
       "titel": "Malpertuis",
@@ -21,13 +21,11 @@
       "link": "http://halfmoonfiles.de/en"
     }
   ],
-  "video": "https://www.youtube.com/watch?v=HV_yHweGFak",
-  "fotos": [],
-  "fotocredits": "Foto's: Nikolas Lestaeghe, Pieterjan Volckaert, Dorien Van Vooren",
   "en": {
     "intro": "Without meaning to, a boy\nhas become a grown-up.",
     "tekst": "<p>He now has a grown-up life<br>in a grown-up house<br>far away from his little-boy home.<br>Today he rebuilds his tree house,<br>and for a moment the grown-up<br>relives his little hut story.</p>",
     "credits": "Concept and direction: Nikolas Lestaeghe",
     "fotocredits": "Photos: Nikolas Lestaeghe, Pieterjan Volckaert, Dorien Van Vooren"
-  }
+  },
+  "volgorde": 1
 }
