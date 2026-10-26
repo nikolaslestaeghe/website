@@ -49,6 +49,20 @@ content:
         type: boolean
         default: true
         description: "Zet uit om een project voorlopig te verbergen."
+      - name: soort
+        label: Soort project
+        type: select
+        description: "Eigen werk = het idee vertrekt (mee) vanuit jou, ook samen met anderen of met K.A.K. Samenwerking = een project van een ander gezelschap of een andere maker waar jij aan meewerkt. Leeg = eigen werk."
+        options:
+          values:
+            - name: eigen
+              label: Eigen werk
+            - name: samenwerking
+              label: Samenwerking
+      - name: met
+        label: Met wie / mijn rol (optioneel)
+        type: string
+        description: "Verschijnt op de tegel als je erover gaat. Bv. 'met K.A.K.' of 'spel & decor · Theater Malpertuis'."
       - name: cover
         label: Grote foto bovenaan
         type: image
@@ -184,6 +198,10 @@ content:
           - name: fotocredits
             label: Photo credits
             type: string
+          - name: met
+            label: With whom / my role
+            type: string
+            description: "Bv. 'with K.A.K.' of 'performance & set · Theater Malpertuis'."
       - name: volgorde
         label: Volgorde binnen hetzelfde jaar (optioneel)
         type: number

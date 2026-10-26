@@ -205,7 +205,7 @@ const scripts = `${datumScript}
 const TALEN = {
   nl: {
     code: "nl", pre: "", ander: "en", anderLabel: "EN", anderNaam: "English",
-    projecten: "Projecten", agenda: "Agenda", contact: "Contact", biografie: "Biografie", home: "Home",
+    projecten: "Projecten", agenda: "Agenda", filterAlles: "Alles", filterEigen: "Eigen werk", filterSamen: "Samenwerkingen", contact: "Contact", biografie: "Biografie", home: "Home",
     inBeeld: "IN\n            <br>BEELD", media: "Media", credits: "Credits",
     speeldata: "Speeldata", geenGepland: "Momenteel geen geplande voorstellingen.", eerderGespeeld: "Eerder gespeeld",
     archief: "Archief", agendaLeeg: "Binnenkort nieuwe data. Abonneer je op de nieuwsbrief om niets te missen.",
@@ -222,7 +222,7 @@ const TALEN = {
   },
   en: {
     code: "en", pre: "/en", ander: "nl", anderLabel: "NL", anderNaam: "Nederlands",
-    projecten: "Projects", agenda: "Agenda", contact: "Contact", biografie: "Biography", home: "Home",
+    projecten: "Projects", agenda: "Agenda", filterAlles: "All", filterEigen: "Own work", filterSamen: "Collaborations", contact: "Contact", biografie: "Biography", home: "Home",
     inBeeld: "IN\n            <br>PICTURES", media: "Media", credits: "Credits",
     speeldata: "Dates", geenGepland: "No performances scheduled at the moment.", eerderGespeeld: "Past performances",
     archief: "Archive", agendaLeeg: "New dates coming soon. Subscribe to the newsletter so you don’t miss a thing.",
@@ -470,21 +470,33 @@ function bouwTaal(L) {
 ${scripts}`;
 
   // Projectenoverzicht
+  const isSamen = (p) => p.soort === "samenwerking";
+  const metFilter = projects.some(isSamen);
+  const filterKnop = (sleutel, label) =>
+    `<span class="hoofding-links projecten-filter" data-filter="${sleutel}" role="button" tabindex="0">${label}</span>`;
   pages["projecten.html"] = `${head(L.projecten, "projecten.html")}
   <div>
     <div class="w-container">
       ${menu("projecten.html")}
     </div>
+${metFilter ? `    <div class="w-container projecten-container projecten-filterbalk">
+      <div class="w-row">
+        <div class="w-col w-col-3 w-hidden-small w-hidden-tiny"></div>
+        <div class="w-col w-col-7">${filterKnop("alles", L.filterAlles)}${filterKnop("eigen", L.filterEigen)}${filterKnop("samenwerking", L.filterSamen)}</div>
+        <div class="w-col w-col-2 w-hidden-small w-hidden-tiny"></div>
+      </div>
+    </div>` : ""}
 ${projects.map((p) => {
   const o = ORIGINEEL[p.slug] || {};
   const tegel = p.tegelfoto || p.cover || asArray(p.fotos)[0];
-  return `    <div class="w-container projecten-container">
+  const met = tr(p, "met");
+  return `    <div class="w-container projecten-container" data-soort="${isSamen(p) ? "samenwerking" : "eigen"}">
       <div class="w-row">
         <div class="w-col w-col-3 w-hidden-small w-hidden-tiny"></div>
         <div class="w-col w-col-7">
           <div class="projecten-div-blauw">
             <a ${fotoAttr("w-inline-block projecten-linkfoto", o.tegel, tegel, "background-size:cover;background-position:50% 50%;")} href="${P}/${p.slug}.html">
-              <div>${kop(p)}${p.jaar ? `<br>${esc(p.jaar)}` : ""}</div>
+              <div>${kop(p)}${p.jaar ? `<br>${esc(p.jaar)}` : ""}${met ? `<span class="tegel-met">${esc(met)}</span>` : ""}</div>
             </a>
           </div>
         </div>
@@ -493,6 +505,23 @@ ${projects.map((p) => {
     </div>`;
 }).join("\n")}
   </div>
+${metFilter ? `  <script>
+    (function () {
+      var knoppen = document.querySelectorAll("[data-filter]");
+      function kies(f) {
+        for (var i = 0; i < knoppen.length; i++) knoppen[i].classList.toggle("actief", knoppen[i].getAttribute("data-filter") === f);
+        var t = document.querySelectorAll("[data-soort]");
+        for (var j = 0; j < t.length; j++) t[j].style.display = f === "alles" || t[j].getAttribute("data-soort") === f ? "" : "none";
+        try { if (history.replaceState) history.replaceState(null, "", f === "alles" ? location.pathname : "#" + f); } catch (e) {}
+      }
+      for (var k = 0; k < knoppen.length; k++) {
+        knoppen[k].onclick = function () { kies(this.getAttribute("data-filter")); };
+        knoppen[k].onkeydown = function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); kies(this.getAttribute("data-filter")); } };
+      }
+      var start = location.hash.replace("#", "");
+      kies(start === "eigen" || start === "samenwerking" ? start : "alles");
+    })();
+  </script>` : ""}
 ${footer()}
 ${scripts}`;
 

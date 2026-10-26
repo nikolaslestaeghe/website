@@ -12,3 +12,27 @@
   font-size: 14px;
   letter-spacing: 0.08em;
 }
+
+/* Filter bovenaan de projectenpagina (Alles · Eigen werk · Samenwerkingen) */
+.projecten-filterbalk { margin-bottom: 0; }
+.projecten-filter {
+  margin: 0 22px 0 0;
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.38);
+  user-select: none;
+}
+.projecten-filter:hover,
+.projecten-filter.actief { color: #4778ff; }
+
+/* Regeltje met wie / in welke rol, verschijnt samen met titel en jaar bij het over de tegel gaan */
+.tegel-met {
+  display: block;
+  margin-top: 10px;
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 400;
+  text-transform: none;
+}
+@media (max-width: 479px) {
+  .tegel-met { font-size: 14px; line-height: 19px; }
+}
