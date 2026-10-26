@@ -35,7 +35,7 @@ De site gebruikt exact de opmaak van de oude site. Er valt niets te updaten en e
 Tips:
 - Werk je nog aan een project? Zet **Zichtbaar op de site** uit tot het klaar is.
 - Er staan al drie verborgen projecten klaar: *Attraction Park Under Construction*, *Bonkers kidsrave* en *The Introverse*.
-- Foto's: liefst liggend, jpg, ongeveer 2000 pixels breed.
+- Foto's: liefst liggend en jpg. Te zware foto's (langer dan 2400 pixels of zwaarder dan 1,5 MB) worden na het opladen automatisch verkleind tot maximaal 2200 pixels; de naam blijft dezelfde. Dat gebeurt binnen een paar minuten via GitHub (*Actions → Foto's verkleinen*).
 - Video: plak een YouTube- of Vimeo-link, of laad een **.mp4-bestand** op bij *Of een videobestand van je computer*. Maximaal 25 MB (± 1 à 2 minuten). Een groter bestand wordt niet gepubliceerd; de rest van de site werkt dan gewoon verder. Maak de video kleiner (bv. met HandBrake of via *Bestand → Exporteer* in QuickTime, 720p) of gebruik YouTube/Vimeo.
 
 ## Eigen werk en samenwerkingen

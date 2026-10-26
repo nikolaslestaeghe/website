@@ -1,0 +1,46 @@
+# Verkleint automatisch te zware foto's die via de beheerpagina worden opgeladen.
+# Draait bij elke wijziging in static/images en zet de verkleinde versies terug in de repository.
+name: Foto's verkleinen
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "static/images/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fotos-verkleinen
+  cancel-in-progress: false
+
+jobs:
+  verkleinen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Pillow installeren
+        run: pip install Pillow
+
+      - name: Te zware foto's verkleinen
+        run: python tools/verklein_fotos.py static/images
+
+      - name: Verkleinde foto's opslaan
+        run: |
+          if git diff --quiet -- static/images; then
+            echo "Niets te verkleinen."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add static/images
+          git commit -m "Foto's automatisch verkleind"
+          git pull --rebase origin main
+          git push origin HEAD:main
