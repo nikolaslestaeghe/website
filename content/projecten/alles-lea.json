@@ -3,11 +3,25 @@
   "kop": "Allez Lea",
   "jaar": "2023",
   "zichtbaar": false,
-  "tekst": "<p></p>",
+  "soort": "samenwerking",
+  "met": "spel & decor · Ilse De Koe",
+  "intro": "ALLEZ LEA is een theatervoorstelling met Ilse de Koe en Nikolas Lestaeghe. Het is een West-Vlaamse familievoorstelling voor jong en ouder!",
+  "tekst": "<p>Vandaag laat gids Rudi je kennismaken met de legende van het lichtmeisje Lea. Ze verlaat nooit haar plek. Ze is zoals zovelen onvervangbaar. Maar de wereld begint ook bij Lea door te dringen. <strong>Hoelang kun je op één plek blijven?</strong> <strong>En hoe weet je wanneer je weer verder moet?</strong> Wat als je in je eigen wereld bent vastgegroeid? Is het dan te laat?</p>",
+  "credits": "Concept: Ilse de Koe\nSpel en tekst: Ilse de Koe en Nikolas Lestaeghe\nDecor: Nikolas Lestaeghe\nTechniek: Marec Zeghers\nProductie: Another Hero\nKostuums: Elles de Koe\nCoach: Tom Ternest\nCoproductie: Uitwijken, Brugge Plus, Cc De Spil Roeselare",
+  "video": "https://youtu.be/5KqVdNxjnbs?si=ZjDCWJ_3v5-3fups",
+  "speellijst_bestand": "/bestanden/speeldata Allez Lea .xlsx",
+  "fotos": [
+    "/images/©KrisBlomme2 Large.jpeg",
+    "/images/IMG_9009 Large-1.jpeg",
+    "/images/IMG_9019 Large.jpeg",
+    "/images/IMG_9030 Large.jpeg",
+    "/images/IMG_9036 Large.jpeg",
+    "/images/IMG_9057 Large.jpeg",
+    "/images/IMG_9063 Large.jpeg"
+  ],
+  "fotocredits": "Jens Vanden Abeele",
   "en": {
     "tekst": "<p></p>",
     "met": "performance & set · Ilse De Koe"
-  },
-  "soort": "samenwerking",
-  "met": "spel & decor · Ilse De Koe"
+  }
 }
