@@ -13,18 +13,23 @@ const fs = require("fs");
 const zlib = require("zlib");
 
 const KOLOMMEN = {
-  datum: ["datum", "date", "dag", "speeldatum"],
-  uur: ["uur", "tijd", "aanvang", "time", "start", "beginuur"],
-  locatie: ["locatie", "zaal", "plaats", "venue", "organisator", "organisatie", "cc", "theater"],
-  stad: ["stad", "gemeente", "city", "woonplaats"],
-  link: ["link", "tickets", "ticket", "url", "website", "info link"],
-  opmerking: ["opmerking", "info", "notitie", "extra", "opmerkingen"],
+  datum: ["datum", "date", "dag", "speeldatum", "data", "wanneer"],
+  uur: ["uur", "tijd", "aanvang", "time", "start", "beginuur", "uren", "hour"],
+  locatie: ["locatie", "zaal", "venue", "organisator", "organisatie", "cc", "theater", "event", "festival", "cultuurcentrum", "speelplek", "organizer"],
+  stad: ["stad", "gemeente", "city", "woonplaats", "waar", "plaats", "town", "where", "land"],
+  link: ["link", "tickets", "ticket", "url", "website", "info link", "ticketlink"],
+  opmerking: ["opmerking", "info", "notitie", "extra", "opmerkingen", "note", "notes", "remark"],
 };
 
 const normKey = (k) => String(k ?? "").trim().toLowerCase().replace(/\s+/g, " ");
+// Herkent een kolom aan de volledige naam ("event/cc" niet nodig in de lijst),
+// of aan een van de woorden in de naam ("event/cc" → "event" → locatie).
 const veldVoor = (kop) => {
   const k = normKey(kop);
+  if (!k) return null;
   for (const [veld, namen] of Object.entries(KOLOMMEN)) if (namen.includes(k)) return veld;
+  const woorden = k.split(/[^a-zà-ÿ]+/).filter(Boolean);
+  for (const [veld, namen] of Object.entries(KOLOMMEN)) if (woorden.some((w) => namen.includes(w))) return veld;
   return null;
 };
 
@@ -88,11 +93,14 @@ function leesPeriode(waarde) {
   return { datum: d, tot: d, dagen: "" };
 }
 
+// Eén of meer uren: "17u" → "17:00", "11u & 17u" → "11:00 & 17:00", "20.30" → "20:30"
 function leesUur(waarde) {
   if (waarde === undefined || waarde === null || waarde === "") return "";
   if (typeof waarde === "number" || /^0?\.\d+$/.test(String(waarde).trim())) return excelUur(waarde);
-  const m = String(waarde).match(/(\d{1,2})\s*[:hu.]\s*(\d{2})?/i);
-  return m ? `${pad(m[1])}:${m[2] || "00"}` : String(waarde).trim();
+  const uren = [...String(waarde).matchAll(/(\d{1,2})\s*(?:[:hu.]\s*(\d{2})?|(?=\s*(?:&|en|and|\+|,|\/|$)))/gi)]
+    .filter((m) => Number(m[1]) <= 24)
+    .map((m) => `${pad(m[1])}:${m[2] || "00"}`);
+  return uren.length ? [...new Set(uren)].join(" & ") : String(waarde).trim();
 }
 
 // ---------- CSV ----------
@@ -182,7 +190,8 @@ function rijenNaarData(rijen) {
   let kopIndex = rijen.findIndex((r) => r.some((v) => veldVoor(v) === "datum"));
   if (kopIndex < 0) kopIndex = 0;
   const velden = rijen[kopIndex].map(veldVoor);
-  return rijen.slice(kopIndex + 1).map((r) => {
+  const onbekend = rijen[kopIndex].filter((k, i) => normKey(k) && !velden[i]).map((k) => String(k).trim());
+  const data = rijen.slice(kopIndex + 1).map((r) => {
     const o = {};
     velden.forEach((veld, i) => { if (veld && r[i] !== undefined && r[i] !== "") o[veld] = r[i]; });
     const plaats = [o.locatie, o.stad].filter((x) => x !== undefined && String(x).trim()).map((x) => String(x).trim()).join(", ");
@@ -197,6 +206,8 @@ function rijenNaarData(rijen) {
       opmerking: o.opmerking ? String(o.opmerking).trim() : "",
     };
   }).filter((d) => d.datum);
+  data.onbekend = onbekend;
+  return data;
 }
 
 function leesBestand(pad) {

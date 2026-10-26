@@ -111,6 +111,7 @@ for (const p of alleProjecten) {
     try {
       const rijen = leesBestand(bestand);
       if (!rijen.length) waarschuwingen.push(`Geen datums gevonden in ${p.speellijst_bestand} (${p.titel}).`);
+      if (rijen.onbekend && rijen.onbekend.length) waarschuwingen.push(`Kolommen niet herkend in ${p.speellijst_bestand} (${p.titel}): ${rijen.onbekend.join(", ")}. Die worden niet getoond.`);
       rijen.forEach((d) => voegToe(d, extra));
     } catch (e) {
       waarschuwingen.push(`Kon ${p.speellijst_bestand} (${p.titel}) niet lezen: ${e.message}`);
