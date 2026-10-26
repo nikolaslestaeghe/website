@@ -41,7 +41,10 @@
       "locatie": "De Maan, Mechelen"
     }
   ],
-  "speellijst_bestand": "/bestanden/speellijst-amai-speciaal-chapeau-2026-2027-3.xlsx",
+  "speellijst_bestand": [
+    "/bestanden/speellijst-amai-speciaal-chapeau-2026-2027-3.xlsx",
+    "/bestanden/Amai speciaal chapeau - seizoen 25-26 voorlopig.xlsx"
+  ],
   "fotos": [
     "/images/amai_speciaal_chapeau_8.jpg",
     "/images/amai_speciaal_chapeau_21.jpg",

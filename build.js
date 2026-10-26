@@ -106,15 +106,15 @@ const voegToe = (d, extra) => {
 for (const p of alleProjecten) {
   const extra = { titel: p.titel, titel_en: (p.en && p.en.titel) || "", slug: p.zichtbaar === false ? null : p.slug };
   asArray(p.speellijst).forEach((d) => voegToe(d, extra));
-  if (p.speellijst_bestand) {
-    const bestand = path.join(STATIC, p.speellijst_bestand.replace(/^\//, ""));
+  for (const bestandNaam of asArray(p.speellijst_bestand).filter(Boolean)) {
+    const bestand = path.join(STATIC, String(bestandNaam).replace(/^\//, ""));
     try {
       const rijen = leesBestand(bestand);
-      if (!rijen.length) waarschuwingen.push(`Geen datums gevonden in ${p.speellijst_bestand} (${p.titel}).`);
-      if (rijen.onbekend && rijen.onbekend.length) waarschuwingen.push(`Kolommen niet herkend in ${p.speellijst_bestand} (${p.titel}): ${rijen.onbekend.join(", ")}. Die worden niet getoond.`);
+      if (!rijen.length) waarschuwingen.push(`Geen datums gevonden in ${bestandNaam} (${p.titel}). Staat er bovenaan een rij met kolomnamen (datum, locatie, ...)?`);
+      if (rijen.onbekend && rijen.onbekend.length) waarschuwingen.push(`Kolommen niet herkend in ${bestandNaam} (${p.titel}): ${rijen.onbekend.join(", ")}. Die worden niet getoond.`);
       rijen.forEach((d) => voegToe(d, extra));
     } catch (e) {
-      waarschuwingen.push(`Kon ${p.speellijst_bestand} (${p.titel}) niet lezen: ${e.message}`);
+      waarschuwingen.push(`Kon ${bestandNaam} (${p.titel}) niet lezen: ${e.message}`);
     }
   }
 }

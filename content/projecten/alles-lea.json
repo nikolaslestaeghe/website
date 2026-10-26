@@ -12,7 +12,9 @@
   "tekst": "<p>Vandaag laat gids Rudi je kennismaken met de legende van het lichtmeisje Lea. Ze verlaat nooit haar plek. Ze is zoals zovelen onvervangbaar. Maar de wereld begint ook bij Lea door te dringen. <strong>Hoelang kun je op één plek blijven?</strong> <strong>En hoe weet je wanneer je weer verder moet?</strong> Wat als je in je eigen wereld bent vastgegroeid? Is het dan te laat?</p>",
   "credits": "Concept: Ilse de Koe\nSpel en tekst: Ilse de Koe en Nikolas Lestaeghe/ Steven Beersman\nDecor: Nikolas Lestaeghe\nTechniek: Marec Zeghers\nProductie: Another Hero\nKostuums: Elles de Koe\nCoach: Tom Ternest\nCoproductie: Uitwijken, Brugge Plus, Cc De Spil Roeselare",
   "video": "https://youtu.be/5KqVdNxjnbs?si=ZjDCWJ_3v5-3fups",
-  "speellijst_bestand": "/bestanden/speeldata Allez Lea .xlsx",
+  "speellijst_bestand": [
+    "/bestanden/speeldata Allez Lea .xlsx"
+  ],
   "fotos": [
     "/images/©KrisBlomme2 Large.jpeg",
     "/images/IMG_9009 Large-1.jpeg",

@@ -135,11 +135,13 @@ content:
             type: string
             description: "Bv. uitverkocht, schoolvoorstelling, première"
       - name: speellijst_bestand
-        label: Speellijst als Excel- of CSV-bestand (optioneel)
-        description: "Kolommen: datum, uur, locatie, stad, link, opmerking. Kolomnamen mogen in eender welke volgorde staan."
+        label: Speellijsten als Excel- of CSV-bestand (optioneel)
+        description: "Je mag meerdere bestanden kiezen, bv. één per seizoen. Zet bovenaan een rij met kolomnamen: datum, uur, locatie, stad, link, opmerking (volgorde maakt niet uit). Kolommen zonder herkenbare naam worden niet getoond."
         type: file
         options:
           media: bestanden
+          multiple:
+            max: 10
       - name: fotos
         label: Foto's
         type: image

@@ -13,7 +13,9 @@
   "citaat": "De Kleine Prins is altijd een prachtig verhaal geweest. Theater Malpertuis doet het letterlijk en figuurlijk fonkelen.\n- Concertnews",
   "credits": "PRODUCTIE Theater Malpertuis\nTEKST Naar Antoine de Saint-Exupéry\nSPELCOACH Piet Arfeuille\nSPEL Naomi van der Horst/ Carine Verbruggen, Thomas Janssens, Nikolas Lestaeghe\nKOSTUUMONTWERP Sietske Van Aerde\nMUZIEK Iben Stalpaert\nTECHNIEK Rik Teunis, Wim Loobuyck",
   "video": "https://vimeo.com/500495520?fl=pl&fe=vl",
-  "speellijst_bestand": "/bestanden/speellijst kleine prins .xlsx",
+  "speellijst_bestand": [
+    "/bestanden/speellijst kleine prins .xlsx"
+  ],
   "fotos": [
     "/images/dekleineprins019.jpeg",
     "/images/dekleineprins006.jpeg",
