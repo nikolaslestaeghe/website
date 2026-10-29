@@ -1,0 +1,28 @@
+{
+  "titel": "DISNIETPARADE",
+  "kop": "DISNIETPARADE",
+  "jaar": "2027",
+  "zichtbaar": true,
+  "soort": "eigen",
+  "cover": "/images/Christ's_Entry_into_Brussels_in_1889-2 Medium.jpeg",
+  "achterfoto": "/images/Christ's_Entry_into_Brussels_in_1889-2 Medium-1.jpeg",
+  "tegelfoto": "/images/Christ's_Entry_into_Brussels_in_1889-2 Medium.jpeg",
+  "intro": "Doe uw raam open! Er komt een stoet voorbij van mensen en dingen. Een scrollsessie vermomd als praalwagenparade. Mensen trekken karren voort, majorettes gooien hun stokken omhoog en agenten hun matrakken. Maar wie heeft deze bende samengebracht? Wie bepaalt wat er gevierd wordt? En wat gebeurt er wanneer de stoet begint te haperen? Een carnaval dat zichzelf ontmaskert. Kom kijken, voor het voorbij is.",
+  "tekst": "<p>Een mix van professionele en niet-professionele spelers zoekt naar rituelen die gemeenschap, cultuur en verbeelding verbinden. Inspiratiebronnen zijn de Griekse Dionysos-optochten, Disneyparades, militaire defilés, reuzenoptochten en betogingen. In een wereld vol afleiding en propaganda onderzoeken we wat nog écht raakt: menselijkheid, identiteit en samenhorigheid. DISNIETPARADE is geen compromis, maar een feestelijke botsing van perspectieven.</p>",
+  "credits": "Van en met: deelnemers ARC, Nikolas Lestaeghe, Naomi van der Horst, Carine van Bruggen, Thomas Janssens, Nicolas Delalieux, en anderen\nSociale begeleiding: Henk Bourgeois, Clara Declercq\nProductieleiding: Noor Deuss\nLichtontwerp: Jonas Lambrigts\nProductie: Antigone\nCoproductie: Perpodium, Malpertuis\nMet de steun van: de Vlaamse overheid, de Stad Kortrijk, de Tax Shelter van de Belgische federale overheid (via Cronos Invest)",
+  "speellijst": [
+    {
+      "datum": "2026-10-29"
+    }
+  ],
+  "speellijst_bestand": [
+    "/bestanden/speellijst disnietparade.xlsx"
+  ],
+  "fotos": [
+    "/images/Christ's_Entry_into_Brussels_in_1889-2 Medium-1.jpeg"
+  ],
+  "fotocredits": "James Ensor",
+  "en": {
+    "tekst": "<p></p>"
+  }
+}
