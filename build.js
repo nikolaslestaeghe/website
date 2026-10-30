@@ -295,7 +295,9 @@ function bouwTaal(L) {
     });
   </script>
   <script type="text/javascript" src="/js/modernizr.js"></script>
-  <link rel="shortcut icon" type="image/x-icon" href="https://daks2k3a4ib2z.cloudfront.net/placeholder/favicon.ico">
+  ${site.icoon
+    ? `<link rel="icon" href="${esc(site.icoon)}">\n  <link rel="apple-touch-icon" href="${esc(site.icoon)}">`
+    : `<link rel="icon" type="image/png" sizes="32x32" href="/icoon-32.png">\n  <link rel="icon" href="/favicon.ico" sizes="any">\n  <link rel="apple-touch-icon" href="/apple-touch-icon.png">`}
 </head>
 <body>`;
 

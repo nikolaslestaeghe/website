@@ -341,6 +341,12 @@ content:
         label: Brevo-formulierlink
         type: string
         description: "De link van je inschrijfformulier in Brevo (begint met https:// en bevat sibforms.com)."
+      - name: icoon
+        label: Icoontje in het browsertabblad (optioneel)
+        type: image
+        description: "Een vierkante afbeelding (bv. 512 x 512 pixels, png). Leeg = de blauwe 'NL'."
+        options:
+          media: images
       - name: achtergrond_home
         label: Foto op de voorpagina
         type: image
