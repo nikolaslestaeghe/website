@@ -1,24 +1,13 @@
 {
-  "titel": "HUT (II)",
-  "kop": "HUT (II)",
+  "titel": "HUT",
+  "kop": "HUT",
   "jaar": "2012",
-  "volgorde": 0,
   "zichtbaar": true,
   "cover": "/images/4hoog-hut-1ccarolinevincart.jpg",
   "achterfoto": "/images/4hoog-hut-2ccarolinevincart.jpg",
   "tegelfoto": "/images/4hoog-hut-3ccarolinevincart.jpg",
-  "intro": "",
-  "tekst": "<p>Kleine Zus neemt je mee naar Grote Broer. Grote Broer kan alles. Wonen in een hut. Praten met konijnen. Vogels doen fluiten. Kleine Zus is er graag. Samen appels rapen. Wortels schrapen en in één pyjama slapen. Langs een imaginair bospad neemt Kleine Zus (Ilse De Koe) je mee het woud in. Een wondermooi decor herbergt de hut waar Grote Broer (Nikolas Lestaeghe) woont.</p>\n<p>Nikolas Lestaeghe bewerkte HUT (I) tot een kindervoorstelling. Dat deed hij voor ‘D-Buut’, een platform van 4hoog, dat jonge theatermakers de kans geeft om te experimenteren met kindertheater.</p>",
-  "citaat": "",
+  "tekst": "<p>Kleine Zus neemt je mee naar Grote Broer. Grote Broer kan alles. Wonen in een hut. Praten met konijnen. Vogels doen fluiten. Kleine Zus is er graag. Samen appels rapen. Wortels schrapen en in één pyjama slapen. Langs een imaginair bospad neemt Kleine Zus (Ilse De Koe) je mee het woud in. Een wondermooi decor herbergt de hut waar Grote Broer (Nikolas Lestaeghe) woont.</p><p>Nikolas Lestaeghe bewerkte HUT (I) tot een kindervoorstelling. Dat deed hij voor ‘D-Buut’, een platform van 4hoog, dat jonge theatermakers de kans geeft om te experimenteren met kindertheater.</p>",
   "credits": "Concept en regie: Nikolas Lestaeghe en Frans Van der Aa\nSpel: Nikolas Lestaeghe en Ilse De Koe\nDecor: Nikolas Lestaeghe, Sarah Geirnaert en Lucas Verbrugge",
-  "media": [
-    {
-      "titel": "4hoog speellijst",
-      "link": "http://www.4hoog.be/nl/production/57/hut",
-      "titel_en": "4hoog tour dates"
-    }
-  ],
-  "video": "",
   "fotos": [
     "/images/hut1.jpg",
     "/images/hut2.jpg",
@@ -28,9 +17,17 @@
     "/images/hut6.jpg"
   ],
   "fotocredits": "Foto's: Caroline Vincart",
+  "media": [
+    {
+      "titel": "4hoog speellijst",
+      "titel_en": "4hoog tour dates",
+      "link": "http://www.4hoog.be/nl/production/57/hut"
+    }
+  ],
   "en": {
-    "tekst": "<p>Little Sister takes you to Big Brother. Big Brother can do anything. Live in a hut. Talk to rabbits. Make birds whistle. Little Sister loves being there. Picking apples together. Scraping carrots and sleeping in one pair of pyjamas. Along an imaginary forest path, Little Sister (Ilse De Koe) takes you into the woods. A wonderful set houses the hut where Big Brother (Nikolas Lestaeghe) lives.</p>\n<p>Nikolas Lestaeghe adapted HUT (I) into a performance for children. He did so for ‘D-Buut’, a platform of 4hoog that gives young theatre makers the chance to experiment with children’s theatre.</p>",
+    "tekst": "<p>Little Sister takes you to Big Brother. Big Brother can do anything. Live in a hut. Talk to rabbits. Make birds whistle. Little Sister loves being there. Picking apples together. Scraping carrots and sleeping in one pair of pyjamas. Along an imaginary forest path, Little Sister (Ilse De Koe) takes you into the woods. A wonderful set houses the hut where Big Brother (Nikolas Lestaeghe) lives.</p><p>Nikolas Lestaeghe adapted HUT (I) into a performance for children. He did so for ‘D-Buut’, a platform of 4hoog that gives young theatre makers the chance to experiment with children’s theatre.</p>",
     "credits": "Concept and direction: Nikolas Lestaeghe and Frans Van der Aa\nPerformers: Nikolas Lestaeghe and Ilse De Koe\nSet: Nikolas Lestaeghe, Sarah Geirnaert and Lucas Verbrugge",
     "fotocredits": "Photos: Caroline Vincart"
-  }
+  },
+  "volgorde": 0
 }
