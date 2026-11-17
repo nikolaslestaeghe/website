@@ -30,6 +30,9 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: openpyxl installeren
+        run: pip install openpyxl
+
       - name: Sheets ophalen
         run: python tools/haal_sheets.py
 

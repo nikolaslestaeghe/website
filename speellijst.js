@@ -154,11 +154,39 @@ function unzip(buf) {
 
 const xmlTekst = (s) => s.replace(/<[^>]+>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, "&");
 
+// Rode tekst herkennen (#ff0000, #cc0000, #e06666, ...; geen oranje of roze).
+// Rijen met rode tekst worden niet opgenomen: bv. nog niet bevestigd of enkel voor intern gebruik.
+const INDEX_ROOD = new Set(["2", "10", "16"]);
+const kleurIsRood = (xml) => {
+  const rgb = (xml.match(/<(?:\w+:)?color[^>]*\srgb="([0-9A-Fa-f]{6,8})"/) || [])[1];
+  if (rgb) {
+    const h = rgb.slice(-6), r = parseInt(h.slice(0, 2), 16), g = parseInt(h.slice(2, 4), 16), b = parseInt(h.slice(4, 6), 16);
+    return r >= 0xb0 && g <= 0x70 && b <= 0x70 && r - Math.max(g, b) >= 0x60;
+  }
+  const idx = (xml.match(/<(?:\w+:)?color[^>]*\sindexed="(\d+)"/) || [])[1];
+  return idx ? INDEX_ROOD.has(idx) : false;
+};
+
+// Tekst met opmaak per stukje (<r><rPr>…</rPr><t>…</t></r>): is een niet-leeg stukje rood?
+const stukjesRood = (x) => [...String(x || "").matchAll(/<r>([\s\S]*?)<\/r>/g)].some((r) => {
+  const rPr = (r[1].match(/<rPr>([\s\S]*?)<\/rPr>/) || [])[1] || "";
+  return kleurIsRood(rPr) && !!xmlTekst((r[1].match(/<t[^>]*>([\s\S]*?)<\/t>/) || [])[1] || "").trim();
+});
+
 function leesXLSX(buf) {
   const z = unzip(buf);
-  const gedeeld = z["xl/sharedStrings.xml"]
-    ? [...z["xl/sharedStrings.xml"]().matchAll(/<si>([\s\S]*?)<\/si>/g)].map((m) => xmlTekst(m[1]))
-    : [];
+  const si = z["xl/sharedStrings.xml"] ? [...z["xl/sharedStrings.xml"]().matchAll(/<si>([\s\S]*?)<\/si>/g)].map((m) => m[1]) : [];
+  const gedeeld = si.map(xmlTekst);
+  // tekst waarvan (een deel) rood is
+  const gedeeldRood = si.map(stukjesRood);
+  // opmaak: welke stijlnummers (s="..") hebben een rood lettertype?
+  const stijlRood = [];
+  if (z["xl/styles.xml"]) {
+    const st = z["xl/styles.xml"]();
+    const fonts = [...((st.match(/<fonts[^>]*>([\s\S]*?)<\/fonts>/) || [])[1] || "").matchAll(/<font>([\s\S]*?)<\/font>|<font\/>/g)].map((m) => kleurIsRood(m[1] || ""));
+    const xfs = ((st.match(/<cellXfs[^>]*>([\s\S]*?)<\/cellXfs>/) || [])[1] || "").match(/<xf\b[^>]*>/g) || [];
+    xfs.forEach((xf, i) => { stijlRood[i] = !!fonts[Number((xf.match(/fontId="(\d+)"/) || [])[1] || 0)]; });
+  }
   const blad = Object.keys(z).filter((n) => /^xl\/worksheets\/sheet\d+\.xml$/.test(n)).sort()[0];
   if (!blad) return [];
   const xml = z[blad]();
@@ -166,6 +194,7 @@ function leesXLSX(buf) {
   const rijen = [];
   for (const r of xml.matchAll(/<row[^>]*>([\s\S]*?)<\/row>/g)) {
     const rij = [];
+    let rood = false;
     for (const c of r[1].matchAll(/<c ([^>]*?)(?:\/>|>([\s\S]*?)<\/c>)/g)) {
       const attrs = c[1];
       const ref = (attrs.match(/r="([A-Z]+\d+)"/) || [])[1];
@@ -176,11 +205,22 @@ function leesXLSX(buf) {
       else if (type === "inlineStr") v = xmlTekst((inhoud.match(/<is>([\s\S]*?)<\/is>/) || [])[1] || "");
       else if (type === "str") v = xmlTekst(v || "");
       else if (v !== undefined && !type) v = Number(v);
+      const stijl = (attrs.match(/\ss="(\d+)"/) || [])[1];
+      const gevuld = v !== undefined && String(v).trim() !== "";
+      if (gevuld && ((stijl && stijlRood[Number(stijl)]) ||
+          (type === "s" && gedeeldRood[Number((inhoud.match(/<v>(\d+)<\/v>/) || [])[1])]) ||
+          (type === "inlineStr" && stukjesRood(inhoud)))) rood = true;
       if (ref) rij[kolomNr(ref)] = v;
     }
+    rij.rood = rood;
     rijen.push(rij);
   }
-  return rijen.filter((r) => r.some((v) => v !== undefined && String(v).trim() !== ""));
+  const gevuld = rijen.filter((r) => r.some((v) => v !== undefined && String(v).trim() !== ""));
+  // de rij met kolomnamen nooit weglaten, ook al is ze rood opgemaakt
+  const kop = gevuld.findIndex((r) => r.some((v) => veldVoor(v) === "datum"));
+  const uit = gevuld.filter((r, i) => !r.rood || i === kop);
+  uit.weggelaten = gevuld.length - uit.length;
+  return uit;
 }
 
 // Zet rijen (eerste rij = kolomnamen) om naar speeldata
@@ -212,8 +252,13 @@ function rijenNaarData(rijen) {
 
 function leesBestand(pad) {
   const buf = fs.readFileSync(pad);
-  if (/\.xlsx$/i.test(pad)) return rijenNaarData(leesXLSX(buf));
+  if (/\.xlsx$/i.test(pad)) {
+    const rijen = leesXLSX(buf);
+    const data = rijenNaarData(rijen);
+    data.rood = rijen.weggelaten || 0;
+    return data;
+  }
   return rijenNaarData(leesCSV(buf.toString("utf8")));
 }
 
-module.exports = { leesBestand, leesDatum, leesPeriode, leesUur };
+module.exports = { leesXLSX, leesBestand, leesDatum, leesPeriode, leesUur };

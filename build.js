@@ -113,6 +113,7 @@ for (const p of alleProjecten) {
       const rijen = leesBestand(bestand);
       if (!rijen.length) waarschuwingen.push(`Geen datums gevonden in ${bestandNaam} (${p.titel}). Staat er bovenaan een rij met kolomnamen (datum, locatie, ...)?`);
       if (rijen.onbekend && rijen.onbekend.length) waarschuwingen.push(`Kolommen niet herkend in ${bestandNaam} (${p.titel}): ${rijen.onbekend.join(", ")}. Die worden niet getoond.`);
+      if (rijen.rood) waarschuwingen.push(`${bestandNaam} (${p.titel}): ${rijen.rood} rij(en) met rode tekst niet opgenomen.`);
       rijen.forEach((d) => voegToe(d, extra));
     } catch (e) {
       waarschuwingen.push(`Kon ${bestandNaam} (${p.titel}) niet lezen: ${e.message}`);
