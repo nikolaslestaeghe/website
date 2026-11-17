@@ -105,7 +105,7 @@ const voegToe = (d, extra) => {
   speeldata.push({ ...periode, uur: d.uur ? leesUur(d.uur) : "", locatie: d.locatie || "", link: d.link || "", opmerking: d.opmerking || "", ...extra });
 };
 for (const p of alleProjecten) {
-  const extra = { titel: p.titel, titel_en: (p.en && p.en.titel) || "", slug: p.zichtbaar === false ? null : p.slug };
+  const extra = { titel: p.titel, titel_en: (p.en && p.en.titel) || "", slug: p.zichtbaar === false ? null : p.slug, proj: p.slug };
   asArray(p.speellijst).forEach((d) => voegToe(d, { ...extra, bron: `${p.slug}:handmatig` }));
   for (const bestandNaam of asArray(p.speellijst_bestand).filter(Boolean)) {
     const bestand = path.join(STATIC, String(bestandNaam).replace(/^\//, ""));
@@ -125,7 +125,7 @@ for (const p of alleProjecten) {
 // en bewaard in static/bestanden/sheets/. Zelfde bestandsnaam als in dat script.
 const sheetBestand = (slug, link) => `${slug}-${crypto.createHash("sha1").update(String(link).trim()).digest("hex").slice(0, 10)}.csv`;
 for (const p of alleProjecten) {
-  const extra = { titel: p.titel, titel_en: (p.en && p.en.titel) || "", slug: p.zichtbaar === false ? null : p.slug };
+  const extra = { titel: p.titel, titel_en: (p.en && p.en.titel) || "", slug: p.zichtbaar === false ? null : p.slug, proj: p.slug };
   for (const link of asArray(p.speellijst_sheet).filter((l) => String(l || "").trim())) {
     const bestand = path.join(STATIC, "bestanden", "sheets", sheetBestand(p.slug, link));
     if (!fs.existsSync(bestand)) {
@@ -190,10 +190,27 @@ for (const d of speeldata) {
   zelfde.dagen = zelfde.dagen || d.dagen;
   zelfde.titel_en = zelfde.titel_en || d.titel_en;
 }
+// Ticketlinks die online gevonden werden (content/ticketlinks.json, bijgehouden door de wekelijkse opdracht).
+// Ze vullen alleen een lege link aan: een link in de speellijst zelf gaat altijd voor.
+// Een link geldt voor één project, op één datum, in één stad/zaal (en eventueel één uur).
+const gevondenLinks = fs.existsSync(path.join(__dirname, "content", "ticketlinks.json"))
+  ? JSON.parse(fs.readFileSync(path.join(__dirname, "content", "ticketlinks.json"), "utf8")) : [];
+const norm = (x) => String(x || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+let aangevuld = 0;
+for (const d of samengevoegd) {
+  if (d.link || !d.proj) continue;
+  const g = gevondenLinks.find((t) => t.project === d.proj && t.link && t.datum >= d.datum && t.datum <= d.tot &&
+    (!t.plaats || norm(d.locatie).includes(norm(t.plaats))) && (!t.uur || (d.uur || "").includes(t.uur)));
+  if (g) { d.link = g.link; aangevuld++; }
+}
+if (aangevuld) console.log(`${aangevuld} ticketlink(s) aangevuld uit content/ticketlinks.json`);
 const dubbels = speeldata.length - samengevoegd.length;
 const agenda = samengevoegd.sort((a, b) => (a.datum + a.uur).localeCompare(b.datum + b.uur));
 const upcoming = agenda.filter((a) => a.tot >= todayISO());
 const past = agenda.filter((a) => a.tot < todayISO()).reverse();
+// Overzicht voor de wekelijkse opdracht die ticketlinks zoekt (wordt niet gepubliceerd)
+fs.writeFileSync(path.join(__dirname, "zonder-ticketlink.json"), JSON.stringify(upcoming.filter((a) => !a.link && a.proj)
+  .map((a) => ({ project: a.proj, titel: a.titel, datum: a.datum, tot: a.tot, uur: a.uur, locatie: a.locatie, opmerking: a.opmerking })), null, 1));
 
 const SITE_URL = "https://www.nikolaslestaeghe.com";
 
