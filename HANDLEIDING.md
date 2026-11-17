@@ -57,6 +57,10 @@ Beide mogen ook samen.
 
 **Rode tekst = niet op de site.** Staat er in een rij van je Excel of Google Sheet iets in het rood (bv. een optie die nog niet bevestigd is, of een overnachting onderweg), dan wordt die hele rij niet op de site gezet. Ook als maar één cel of een deel van een cel rood is. Oranje, roze of andere kleuren tellen niet mee. Zet de tekst terug in het zwart zodra de voorstelling bevestigd is.
 
+**Interne rijen worden ook overgeslagen**, ook als je vergeet ze rood te maken: staat in de kolom met de zaal/het event of de stad een woord als opbouw, afbouw, build up, setup, inladen, reizen, travel, rijden, terugrijden, overnachten, slapen, hotel, camionette, repareren of repetitie, dan komt die rij niet op de site. Opmerkingen worden daarbij niet bekeken.
+
+**Datums zonder jaartal** ("15/10", "16-17/11") krijgen het jaar van de rij erboven (of het jaar erna, na de jaarwissel). Zet dus best minstens bij de eerste datum van elk jaar het jaartal. Ook "29/10 tot 1/11" werkt.
+
 **Dubbele data:** staat dezelfde voorstelling in twee speellijsten (bv. twee Excels, of een Excel en een Google Sheet), dan verschijnt ze maar één keer. De site herkent dat ook als ze een beetje anders geschreven is ("CC De Spil, Roeselare" en "Roeselare") of als in één van beide het uur ontbreekt; de vollediger versie wordt getoond. Twee voorstellingen op dezelfde dag en plaats met verschillende uren blijven apart. Binnen één speellijst wordt niets samengevoegd.
 
 **Speellijst uit Google Sheets:** plak bij een project de link naar een Google Sheet in *Speellijst uit Google Sheets*. Deel de sheet als *Iedereen met de link kan bekijken*. Gebruik bij voorkeur een apart tabblad met enkel publieke info (datum, uur, locatie, stad, link, opmerking) en kopieer de link terwijl dat tabblad openstaat. GitHub haalt de sheet elke dag rond 7u en 13u op (en meteen na het bewaren van het project); verandert er iets, dan wordt de site vanzelf bijgewerkt. Meteen bijwerken kan op GitHub via *Actions → Speellijsten ophalen → Run workflow*. De opgehaalde sheets zelf worden niet op de site gepubliceerd.

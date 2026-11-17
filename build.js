@@ -114,6 +114,7 @@ for (const p of alleProjecten) {
       if (!rijen.length) waarschuwingen.push(`Geen datums gevonden in ${bestandNaam} (${p.titel}). Staat er bovenaan een rij met kolomnamen (datum, locatie, ...)?`);
       if (rijen.onbekend && rijen.onbekend.length) waarschuwingen.push(`Kolommen niet herkend in ${bestandNaam} (${p.titel}): ${rijen.onbekend.join(", ")}. Die worden niet getoond.`);
       if (rijen.rood) waarschuwingen.push(`${bestandNaam} (${p.titel}): ${rijen.rood} rij(en) met rode tekst niet opgenomen.`);
+      if (rijen.intern && rijen.intern.length) console.log(`${bestandNaam} (${p.titel}): ${rijen.intern.length} interne rij(en) (opbouw, reizen, ...) niet opgenomen: ${rijen.intern.join(" | ")}`);
       rijen.forEach((d) => voegToe(d, { ...extra, bron: bestandNaam }));
     } catch (e) {
       waarschuwingen.push(`Kon ${bestandNaam} (${p.titel}) niet lezen: ${e.message}`);
@@ -135,6 +136,7 @@ for (const p of alleProjecten) {
       const rijen = leesBestand(bestand);
       if (!rijen.length) waarschuwingen.push(`Geen datums gevonden in de Google Sheet van ${p.titel}. Staat er bovenaan een rij met kolomnamen (datum, locatie, ...)?`);
       if (rijen.onbekend && rijen.onbekend.length) waarschuwingen.push(`Kolommen niet herkend in de Google Sheet van ${p.titel}: ${rijen.onbekend.join(", ")}. Die worden niet getoond.`);
+      if (rijen.intern && rijen.intern.length) console.log(`Google Sheet van ${p.titel}: ${rijen.intern.length} interne rij(en) (opbouw, reizen, ...) niet opgenomen: ${rijen.intern.join(" | ")}`);
       rijen.forEach((d) => voegToe(d, { ...extra, bron: link }));
     } catch (e) {
       waarschuwingen.push(`Kon de Google Sheet van ${p.titel} niet lezen: ${e.message}`);
@@ -330,6 +332,12 @@ function bouwTaal(L) {
   const formatPeriode = (a) => {
     if (!a.dagen || a.tot === a.datum) return formatDate(a.datum);
     const d = new Date(a.datum + "T12:00:00");
+    if (a.tot && a.tot.slice(0, 7) !== a.datum.slice(0, 7)) {
+      // over twee maanden heen: "29 oktober – 1 november 2026"
+      const t = new Date(a.tot + "T12:00:00");
+      const begin = L.datum(d.getDate(), L.maanden[d.getMonth()], d.getFullYear());
+      return (a.datum.slice(0, 4) === a.tot.slice(0, 4) ? begin.replace(/,?\s*\d{4}$/, "") : begin) + " – " + formatDate(a.tot);
+    }
     return L.datum(a.dagen.replace(/ en /g, L.en), L.maanden[d.getMonth()], d.getFullYear());
   };
 

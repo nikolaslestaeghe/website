@@ -47,6 +47,15 @@ const excelUur = (n) => {
 
 const MAANDNAMEN = { jan: 1, feb: 2, maa: 3, mrt: 3, apr: 4, mei: 5, jun: 6, jul: 7, aug: 8, sep: 9, okt: 10, oct: 10, nov: 11, dec: 12 };
 
+// Geeft JJJJ-MM-DD terug, of "" als dag of maand onmogelijk is (bv. "16-17/11" mag geen "2011-17-16" worden)
+function geldig(jaar, maand, dag) {
+  const j = +jaar, mnd = +maand, d = +dag;
+  if (!(mnd >= 1 && mnd <= 12 && d >= 1 && d <= 31 && j >= 1990 && j <= 2100)) return "";
+  const dt = new Date(Date.UTC(j, mnd - 1, d));
+  if (dt.getUTCMonth() !== mnd - 1) return "";
+  return `${j}-${pad(mnd)}-${pad(d)}`;
+}
+
 // Zet allerlei schrijfwijzen om naar JJJJ-MM-DD
 function leesDatum(waarde) {
   if (waarde === undefined || waarde === null || waarde === "") return "";
@@ -54,21 +63,36 @@ function leesDatum(waarde) {
   const s = String(waarde).trim().toLowerCase();
   let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
   if (m) return `${m[1]}-${pad(m[2])}-${pad(m[3])}`;
-  m = s.match(/(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})/);
-  if (m) return `${m[3].length === 2 ? "20" + m[3] : m[3]}-${pad(m[2])}-${pad(m[1])}`;
+  m = s.match(/(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})(?!\d)/);
+  if (m) return geldig(m[3].length === 2 ? "20" + m[3] : m[3], m[2], m[1]);
   m = s.match(/(\d{1,2})\s+([a-z]{3})[a-z]*\.?\s+(\d{4})/); // 12 november 2026
   if (m && MAANDNAMEN[m[2]]) return `${m[3]}-${pad(MAANDNAMEN[m[2]])}-${pad(m[1])}`;
   return "";
 }
 
-// Meerdere dagen in één cel: "8 en 9/11/25", "29-30/11/25", "17,18,19/10/26", "14+15/10/26", "5-7/02/2027"
+// Meerdere dagen in één cel: "8 en 9/11/25", "29-30/11/25", "17,18,19/10/26", "14+15/10/26", "5-7/02/2027",
+// "29/10 tot 1/11/26". Zonder jaartal ("16-17/11", "15/10") wordt standaardJaar gebruikt (zonderJaar: true).
 // Geeft { datum (eerste dag), tot (laatste dag), dagen (tekst, bv. "8 en 9") } terug.
-function leesPeriode(waarde) {
+function leesPeriode(waarde, standaardJaar) {
+  const leeg = { datum: "", tot: "", dagen: "" };
   if (typeof waarde !== "number" && !/^\d{4,5}(\.\d+)?$/.test(String(waarde ?? "").trim())) {
     const s = String(waarde ?? "").trim().toLowerCase();
-    const m = s.match(/^((?:\d{1,2}\s*(?:-|–|en|&|\+|,)\s*)+\d{1,2})\s*[\/.\-]\s*(\d{1,2})\s*[\/.\-]\s*(\d{2,4})/);
+    // "29/10 tot 1/11" of "31/3 tot 3-4-2025": van ... tot ...
+    const t = s.match(/^(.+?)\s+(?:tot|t\/m|tem|until|to)\s+(.+)$/);
+    if (t) {
+      const eind = leesPeriode(t[2], standaardJaar);
+      if (!eind.datum) return leeg;
+      let begin = leesPeriode(t[1], eind.datum.slice(0, 4));
+      if (begin.datum && begin.datum > eind.datum && begin.zonderJaar) begin = leesPeriode(t[1], String(+eind.datum.slice(0, 4) - 1));
+      if (!begin.datum) return leeg;
+      const kort = (d) => `${+d.slice(8)}/${+d.slice(5, 7)}`;
+      return { datum: begin.datum, tot: eind.tot, dagen: `${kort(begin.datum)} – ${kort(eind.tot)}`, zonderJaar: eind.zonderJaar, ruimMaand: true };
+    }
+    const m = s.match(/^((?:\d{1,2}\s*(?:-|–|en|&|\+|,)\s*)*\d{1,2})\s*[\/.\-]\s*(\d{1,2})(?:\s*[\/.\-]\s*(\d{2,4}))?(?![\d\/.\-])/);
     if (m) {
-      const jaar = m[3].length === 2 ? "20" + m[3] : m[3];
+      const zonderJaar = !m[3];
+      if (zonderJaar && !standaardJaar) return leeg;
+      const jaar = zonderJaar ? String(standaardJaar) : m[3].length === 2 ? "20" + m[3] : m[3];
       const delen = m[1].split(/\s*(-|–|en|&|\+|,)\s*/);
       let dagen = [], bereik = false;
       for (let i = 0; i < delen.length; i += 2) {
@@ -82,10 +106,12 @@ function leesPeriode(waarde) {
       dagen = [...new Set(dagen)].filter((d) => d >= 1 && d <= 31).sort((a, b) => a - b);
       if (dagen.length) {
         const eerste = dagen[0], laatste = dagen[dagen.length - 1];
+        const van = geldig(jaar, m[2], eerste), tot = geldig(jaar, m[2], laatste);
+        if (!van || !tot) return leeg;
         const tekst = bereik && dagen.length > 2
           ? `${eerste} – ${laatste}`
-          : dagen.length === 1 ? String(eerste) : `${dagen.slice(0, -1).join(", ")} en ${laatste}`;
-        return { datum: `${jaar}-${pad(m[2])}-${pad(eerste)}`, tot: `${jaar}-${pad(m[2])}-${pad(laatste)}`, dagen: tekst };
+          : dagen.length === 1 ? "" : `${dagen.slice(0, -1).join(", ")} en ${laatste}`;
+        return { datum: van, tot, dagen: tekst, zonderJaar };
       }
     }
   }
@@ -223,6 +249,20 @@ function leesXLSX(buf) {
   return uit;
 }
 
+const verschuif = (iso, dagen) => new Date(Date.parse(iso + "T00:00:00Z") + dagen * 86400000).toISOString().slice(0, 10);
+
+// Interne rijen (opbouw, reizen, overnachten, ...) komen niet op de site, ook als ze niet in het rood staan.
+// Er wordt alleen gekeken naar de kolommen locatie/zaal/event en stad, niet naar opmerkingen.
+const INTERNE_WOORDEN = [
+  "opbouw", "opbouwen", "afbouw", "afbouwen", "build up", "buildup", "build-up", "build", "setup", "set up", "set-up",
+  "get in", "get-in", "get out", "get-out", "load in", "load-in", "load out", "inladen", "uitladen", "laden",
+  "reizen", "reis", "reisdag", "travel", "travelling", "traveling", "rijden", "terugrijden", "heenrijden", "terugreis", "heenreis", "drive", "driving",
+  "overnachten", "overnachting", "slapen", "sleep", "hotel", "camionette", "bestelwagen",
+  "repareren", "herstellen", "repetitie", "repetities", "repeteren", "rehearsal", "rehearsals",
+];
+const INTERN_RE = new RegExp(`(^|[^a-zà-ÿ])(${INTERNE_WOORDEN.map((w) => w.replace(/[-\s]/g, "[-\\s]?")).join("|")})(?=$|[^a-zà-ÿ])`, "i");
+const isIntern = (o) => [o.locatie, o.stad].some((v) => v !== undefined && INTERN_RE.test(String(v)));
+
 // Zet rijen (eerste rij = kolomnamen) om naar speeldata
 function rijenNaarData(rijen) {
   if (!rijen.length) return [];
@@ -231,11 +271,18 @@ function rijenNaarData(rijen) {
   if (kopIndex < 0) kopIndex = 0;
   const velden = rijen[kopIndex].map(veldVoor);
   const onbekend = rijen[kopIndex].filter((k, i) => normKey(k) && !velden[i]).map((k) => String(k).trim());
+  let vorige = "";
+  const intern = [];
   const data = rijen.slice(kopIndex + 1).map((r) => {
     const o = {};
     velden.forEach((veld, i) => { if (veld && r[i] !== undefined && r[i] !== "") o[veld] = r[i]; });
     const plaats = [o.locatie, o.stad].filter((x) => x !== undefined && String(x).trim()).map((x) => String(x).trim()).join(", ");
-    const periode = leesPeriode(o.datum);
+    let periode = leesPeriode(o.datum, vorige ? vorige.slice(0, 4) : "");
+    // Zonder jaartal: speellijsten lopen chronologisch, dus het jaar van de vorige rij,
+    // of het jaar erna als de datum anders ruim vóór de vorige zou vallen (december → januari).
+    if (periode.zonderJaar && vorige && periode.datum < verschuif(vorige, -60)) periode = leesPeriode(o.datum, String(+vorige.slice(0, 4) + 1));
+    if (periode.datum) vorige = periode.datum;
+    if (periode.datum && isIntern(o)) { intern.push(`${o.datum}: ${[o.locatie, o.stad].filter(Boolean).join(", ")}`.trim()); return { datum: "" }; }
     return {
       datum: periode.datum,
       tot: periode.tot,
@@ -247,6 +294,7 @@ function rijenNaarData(rijen) {
     };
   }).filter((d) => d.datum);
   data.onbekend = onbekend;
+  data.intern = intern;
   return data;
 }
 
