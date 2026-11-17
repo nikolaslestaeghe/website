@@ -106,7 +106,7 @@ const voegToe = (d, extra) => {
 };
 for (const p of alleProjecten) {
   const extra = { titel: p.titel, titel_en: (p.en && p.en.titel) || "", slug: p.zichtbaar === false ? null : p.slug };
-  asArray(p.speellijst).forEach((d) => voegToe(d, extra));
+  asArray(p.speellijst).forEach((d) => voegToe(d, { ...extra, bron: `${p.slug}:handmatig` }));
   for (const bestandNaam of asArray(p.speellijst_bestand).filter(Boolean)) {
     const bestand = path.join(STATIC, String(bestandNaam).replace(/^\//, ""));
     try {
@@ -114,7 +114,7 @@ for (const p of alleProjecten) {
       if (!rijen.length) waarschuwingen.push(`Geen datums gevonden in ${bestandNaam} (${p.titel}). Staat er bovenaan een rij met kolomnamen (datum, locatie, ...)?`);
       if (rijen.onbekend && rijen.onbekend.length) waarschuwingen.push(`Kolommen niet herkend in ${bestandNaam} (${p.titel}): ${rijen.onbekend.join(", ")}. Die worden niet getoond.`);
       if (rijen.rood) waarschuwingen.push(`${bestandNaam} (${p.titel}): ${rijen.rood} rij(en) met rode tekst niet opgenomen.`);
-      rijen.forEach((d) => voegToe(d, extra));
+      rijen.forEach((d) => voegToe(d, { ...extra, bron: bestandNaam }));
     } catch (e) {
       waarschuwingen.push(`Kon ${bestandNaam} (${p.titel}) niet lezen: ${e.message}`);
     }
@@ -135,7 +135,7 @@ for (const p of alleProjecten) {
       const rijen = leesBestand(bestand);
       if (!rijen.length) waarschuwingen.push(`Geen datums gevonden in de Google Sheet van ${p.titel}. Staat er bovenaan een rij met kolomnamen (datum, locatie, ...)?`);
       if (rijen.onbekend && rijen.onbekend.length) waarschuwingen.push(`Kolommen niet herkend in de Google Sheet van ${p.titel}: ${rijen.onbekend.join(", ")}. Die worden niet getoond.`);
-      rijen.forEach((d) => voegToe(d, extra));
+      rijen.forEach((d) => voegToe(d, { ...extra, bron: link }));
     } catch (e) {
       waarschuwingen.push(`Kon de Google Sheet van ${p.titel} niet lezen: ${e.message}`);
     }
@@ -144,13 +144,52 @@ for (const p of alleProjecten) {
 for (const a of readCollection("agenda")) {
   const key = String(a.project || "").split("/").pop().replace(/\.json$/, "");
   const proj = key && alleProjecten.find((p) => p.slug === key);
-  voegToe(a, { titel: a.titel || (proj && proj.titel) || "", titel_en: a.titel_en || (!a.titel && proj && proj.en && proj.en.titel) || "", slug: proj && proj.zichtbaar !== false ? proj.slug : null });
+  voegToe(a, { bron: `agenda:${a.slug}`, titel: a.titel || (proj && proj.titel) || "", titel_en: a.titel_en || (!a.titel && proj && proj.en && proj.en.titel) || "", slug: proj && proj.zichtbaar !== false ? proj.slug : null });
 }
-// dubbels weglaten, sorteren op datum en uur
-const gezien = new Set();
-const agenda = speeldata
-  .filter((d) => { const k = [d.datum, d.uur, d.titel, d.locatie].join("|").toLowerCase(); if (gezien.has(k)) return false; gezien.add(k); return true; })
-  .sort((a, b) => (a.datum + a.uur).localeCompare(b.datum + b.uur));
+// ---------- dubbels samenvoegen ----------
+// Dezelfde voorstelling kan in meerdere speellijsten staan (bv. twee Excels, of Excel + Google Sheet),
+// soms een beetje anders geschreven. Twee regels gelden als dezelfde voorstelling als:
+//   - ze bij hetzelfde project horen en op dezelfde dag(en) vallen, én
+//   - de plaats overeenkomt ("CC De Spil, Roeselare" = "De Spil, Roeselare" = "Roeselare"), of één van beide geen plaats heeft, én
+//   - de uren overlappen ("11:00 & 17:00" = "11:00"), of één van beide geen uur heeft.
+// Twee voorstellingen op dezelfde dag en plaats met verschillende uren (bv. 10:30 en 13:30) blijven apart.
+// Binnen één en dezelfde speellijst wordt niets samengevoegd (daar staat elke regel er bewust).
+// Bij samenvoegen wordt de vollediger informatie bewaard.
+const GEWONE_WOORDEN = new Set(["cc", "ccc", "cultuurcentrum", "gc", "de", "het", "den", "le", "la", "les", "theater", "theatre", "zaal", "salle", "van", "in"]);
+const woorden = (s) => new Set(String(s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+  .split(/[^a-z0-9]+/).filter((w) => w && !GEWONE_WOORDEN.has(w)));
+const plaatsGelijk = (a, b) => {
+  const A = woorden(a), B = woorden(b);
+  if (!A.size || !B.size) return true;
+  const [klein, groot] = A.size <= B.size ? [A, B] : [B, A];
+  return [...klein].every((w) => groot.has(w));
+};
+const uren = (u) => new Set(String(u || "").match(/\d{2}:\d{2}/g) || []);
+const urenGelijk = (a, b) => {
+  const A = uren(a), B = uren(b);
+  if (!A.size || !B.size) return true;
+  return [...A].some((u) => B.has(u));
+};
+const langste = (x, y) => (String(y || "").length > String(x || "").length ? y : x);
+const samengevoegd = [];
+for (const d of speeldata) {
+  const sleutel = (x) => [x.datum, x.uur, x.titel, x.locatie].join("|").toLowerCase();
+  const zelfde = samengevoegd.find((e) =>
+    e.titel === d.titel && e.datum === d.datum && e.tot === d.tot &&
+    (e.bronnen.has(d.bron)
+      ? sleutel(e) === sleutel(d) // binnen dezelfde speellijst: enkel echt identieke regels
+      : plaatsGelijk(e.locatie, d.locatie) && urenGelijk(e.uur, d.uur)));
+  if (!zelfde) { samengevoegd.push({ ...d, bronnen: new Set([d.bron]) }); continue; }
+  zelfde.bronnen.add(d.bron);
+  zelfde.uur = uren(d.uur).size > uren(zelfde.uur).size ? d.uur : zelfde.uur;
+  zelfde.locatie = langste(zelfde.locatie, d.locatie);
+  zelfde.link = zelfde.link || d.link;
+  zelfde.opmerking = zelfde.opmerking || d.opmerking;
+  zelfde.dagen = zelfde.dagen || d.dagen;
+  zelfde.titel_en = zelfde.titel_en || d.titel_en;
+}
+const dubbels = speeldata.length - samengevoegd.length;
+const agenda = samengevoegd.sort((a, b) => (a.datum + a.uur).localeCompare(b.datum + b.uur));
 const upcoming = agenda.filter((a) => a.tot >= todayISO());
 const past = agenda.filter((a) => a.tot < todayISO()).reverse();
 
@@ -739,6 +778,6 @@ const missing = new Set();
 const check = (src) => { if (src && src.startsWith("/") && !fs.existsSync(path.join(OUT, src))) missing.add(src); };
 projects.forEach((p) => [p.cover, p.achterfoto, p.tegelfoto, ...asArray(p.fotos)].forEach(check));
 check(bio.portret);
-console.log(`Klaar: ${aantalPaginas} pagina's (NL + EN), ${projects.length} projecten, ${agenda.length} speeldata (${upcoming.length} komend).`);
+console.log(`Klaar: ${aantalPaginas} pagina's (NL + EN), ${projects.length} projecten, ${agenda.length} speeldata (${upcoming.length} komend)${dubbels ? `, ${dubbels} dubbel(s) samengevoegd` : ""}.`);
 waarschuwingen.forEach((w) => console.log("Let op: " + w));
 if (missing.size) console.log(`Let op, ontbrekende foto's: ${[...missing].join(", ")}`);
