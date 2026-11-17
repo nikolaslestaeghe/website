@@ -2,21 +2,12 @@
   "titel": "Groet #2",
   "kop": "Groet #2",
   "jaar": "2013",
-  "volgorde": 0,
-  "zichtbaar": true,
+  "zichtbaar": false,
   "cover": "/images/01_1.jpg",
   "achterfoto": "/images/06_1.jpg",
   "tegelfoto": "/images/01_3.jpg",
-  "intro": "",
-  "tekst": "<p>Een wankele kapel, een plastic trompet en een goedkoop koffiezetapparaat. Met beperkte middelen geeft Nikolas Lestaeghe een nieuwe invulling aan gebruiken en tradities.<br>Hij vertelt een verhaal zonder te praten. Met kartonnen acteurs brengt hij op een beeldende en persoonlijke manier een solo over omgaan met verlies, tradities en afkomst.</p>\n<p>Met dank aan: Rits, Harry Cole en De Maan, figurentheater</p>",
-  "citaat": "",
+  "tekst": "<p>Een wankele kapel, een plastic trompet en een goedkoop koffiezetapparaat. Met beperkte middelen geeft Nikolas Lestaeghe een nieuwe invulling aan gebruiken en tradities.<br>Hij vertelt een verhaal zonder te praten. Met kartonnen acteurs brengt hij op een beeldende en persoonlijke manier een solo over omgaan met verlies, tradities en afkomst.</p><p>Met dank aan: Rits, Harry Cole en De Maan, figurentheater</p>",
   "credits": "Concept/spel: Nikolas Lestaeghe\nTechniek/lichtontwerp: Marcel Van Damme",
-  "media": [
-    {
-      "titel": "Malpertuis",
-      "link": "http://www.malpertuis.be/gastproducties/218/"
-    }
-  ],
   "video": "https://vimeo.com/70314393",
   "fotos": [
     "/images/01_1.jpg",
@@ -31,11 +22,18 @@
     "/images/10_1.jpg"
   ],
   "fotocredits": "Foto's: Marc Vandermeulen · Filmstills: Nikolas Lestaeghe",
+  "media": [
+    {
+      "titel": "Malpertuis",
+      "link": "http://www.malpertuis.be/gastproducties/218/"
+    }
+  ],
   "en": {
     "titel": "Salute #2",
     "kop": "Salute #2",
-    "tekst": "<p>A wobbly brass band, a plastic trumpet and a cheap coffee maker. With limited means, Nikolas Lestaeghe gives new meaning to customs and traditions.<br>He tells a story without speaking. With cardboard actors he presents, in a visual and personal way, a solo about dealing with loss, traditions and roots.</p>\n<p>With thanks to: Rits, Harry Cole and De Maan, puppet theatre</p>",
+    "tekst": "<p>A wobbly brass band, a plastic trumpet and a cheap coffee maker. With limited means, Nikolas Lestaeghe gives new meaning to customs and traditions.<br>He tells a story without speaking. With cardboard actors he presents, in a visual and personal way, a solo about dealing with loss, traditions and roots.</p><p>With thanks to: Rits, Harry Cole and De Maan, puppet theatre</p>",
     "credits": "Concept/performance: Nikolas Lestaeghe\nTechnics/lighting design: Marcel Van Damme",
     "fotocredits": "Photos: Marc Vandermeulen · Film stills: Nikolas Lestaeghe"
-  }
+  },
+  "volgorde": 0
 }
