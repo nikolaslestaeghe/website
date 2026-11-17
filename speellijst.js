@@ -270,6 +270,11 @@ function rijenNaarData(rijen) {
   let kopIndex = rijen.findIndex((r) => r.some((v) => veldVoor(v) === "datum"));
   if (kopIndex < 0) kopIndex = 0;
   const velden = rijen[kopIndex].map(veldVoor);
+  // Twee kolommen die op een plaats wijzen ("waar" + "stad") en geen zaal-kolom: de eerste is dan de zaal
+  if (!velden.includes("locatie")) {
+    const plaatsen = velden.map((v, i) => (v === "stad" ? i : -1)).filter((i) => i >= 0);
+    if (plaatsen.length > 1) velden[plaatsen[0]] = "locatie";
+  }
   const onbekend = rijen[kopIndex].filter((k, i) => normKey(k) && !velden[i]).map((k) => String(k).trim());
   let vorige = "";
   const intern = [];
