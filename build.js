@@ -5,6 +5,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 const { leesBestand, leesDatum, leesPeriode, leesUur } = require("./speellijst");
 
 const ROOT = __dirname;
@@ -115,6 +116,27 @@ for (const p of alleProjecten) {
       rijen.forEach((d) => voegToe(d, extra));
     } catch (e) {
       waarschuwingen.push(`Kon ${bestandNaam} (${p.titel}) niet lezen: ${e.message}`);
+    }
+  }
+}
+// Speellijsten uit Google Sheets: worden door GitHub opgehaald (tools/haal_sheets.py)
+// en bewaard in static/bestanden/sheets/. Zelfde bestandsnaam als in dat script.
+const sheetBestand = (slug, link) => `${slug}-${crypto.createHash("sha1").update(String(link).trim()).digest("hex").slice(0, 10)}.csv`;
+for (const p of alleProjecten) {
+  const extra = { titel: p.titel, titel_en: (p.en && p.en.titel) || "", slug: p.zichtbaar === false ? null : p.slug };
+  for (const link of asArray(p.speellijst_sheet).filter((l) => String(l || "").trim())) {
+    const bestand = path.join(STATIC, "bestanden", "sheets", sheetBestand(p.slug, link));
+    if (!fs.existsSync(bestand)) {
+      waarschuwingen.push(`Google Sheet van ${p.titel} is nog niet opgehaald (dat gebeurt binnen enkele minuten na het bewaren).`);
+      continue;
+    }
+    try {
+      const rijen = leesBestand(bestand);
+      if (!rijen.length) waarschuwingen.push(`Geen datums gevonden in de Google Sheet van ${p.titel}. Staat er bovenaan een rij met kolomnamen (datum, locatie, ...)?`);
+      if (rijen.onbekend && rijen.onbekend.length) waarschuwingen.push(`Kolommen niet herkend in de Google Sheet van ${p.titel}: ${rijen.onbekend.join(", ")}. Die worden niet getoond.`);
+      rijen.forEach((d) => voegToe(d, extra));
+    } catch (e) {
+      waarschuwingen.push(`Kon de Google Sheet van ${p.titel} niet lezen: ${e.message}`);
     }
   }
 }
@@ -699,7 +721,10 @@ fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(OUT, { recursive: true });
 fs.cpSync(STATIC, OUT, {
   recursive: true,
-  filter: (src) => !teGroot.has("/" + path.relative(STATIC, src).split(path.sep).join("/")),
+  filter: (src) => {
+    const rel = "/" + path.relative(STATIC, src).split(path.sep).join("/");
+    return !teGroot.has(rel) && !rel.startsWith("/bestanden/sheets"); // opgehaalde sheets niet publiceren
+  },
 });
 teGroot.forEach((f) => waarschuwingen.push(`${f} is groter dan 25 MB (${mb(fs.statSync(path.join(STATIC, f)).size)} MB) en wordt niet gepubliceerd. Maak het bestand kleiner of gebruik een YouTube- of Vimeo-link.`));
 let aantalPaginas = 0;

@@ -55,6 +55,9 @@ Elk project heeft een eigen speellijst. Daar zijn twee manieren voor:
 
 Beide mogen ook samen.
 
+**Speellijst uit Google Sheets:** plak bij een project de link naar een Google Sheet in *Speellijst uit Google Sheets*. Deel de sheet als *Iedereen met de link kan bekijken*. Gebruik bij voorkeur een apart tabblad met enkel publieke info (datum, uur, locatie, stad, link, opmerking) en kopieer de link terwijl dat tabblad openstaat. GitHub haalt de sheet elke dag rond 7u en 13u op (en meteen na het bewaren van het project); verandert er iets, dan wordt de site vanzelf bijgewerkt. Meteen bijwerken kan op GitHub via *Actions → Speellijsten ophalen → Run workflow*. De opgehaalde sheets zelf worden niet op de site gepubliceerd.
+
+
 Wat de site daarmee doet:
 - De **agendapagina** toont alle komende data van alle projecten samen, op datum.
 - Voorbije data verhuizen **vanzelf** naar het **archief**, gegroepeerd per jaar. Dat gebeurt telkens iemand de pagina opent, dus ook als je een tijd niets aanpast.

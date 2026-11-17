@@ -142,6 +142,11 @@ content:
           media: bestanden
           multiple:
             max: 10
+      - name: speellijst_sheet
+        label: Speellijst uit Google Sheets (optioneel)
+        description: "Plak de link naar je Google Sheet (gedeeld als 'Iedereen met de link kan bekijken'). Wijzigingen in de sheet komen elke dag rond 7u en 13u vanzelf op de site. Tip: gebruik een apart tabblad met enkel wat publiek mag, en kopieer de link terwijl dat tabblad open staat."
+        type: string
+        list: true
       - name: fotos
         label: Foto's
         type: image

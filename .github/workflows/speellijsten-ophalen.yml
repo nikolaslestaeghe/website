@@ -1,0 +1,47 @@
+# Haalt speellijsten op uit Google Sheets (veld "Google Sheets-link" bij een project).
+# Draait twee keer per dag en telkens een project bewaard wordt. Alleen als er iets veranderde,
+# wordt er iets opgeslagen en bouwt Cloudflare de site opnieuw.
+name: Speellijsten ophalen
+
+on:
+  schedule:
+    - cron: "17 5 * * *"   # ± 6u/7u Belgische tijd
+    - cron: "17 12 * * *"  # ± 13u/14u Belgische tijd
+  push:
+    branches: [main]
+    paths:
+      - "content/projecten/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: speellijsten-ophalen
+  cancel-in-progress: false
+
+jobs:
+  ophalen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Sheets ophalen
+        run: python tools/haal_sheets.py
+
+      - name: Wijzigingen opslaan
+        run: |
+          git add -A static/bestanden/sheets
+          if git diff --cached --quiet; then
+            echo "Geen wijzigingen in de speellijsten."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Speellijsten bijgewerkt uit Google Sheets"
+          git pull --rebase origin main
+          git push origin HEAD:main
